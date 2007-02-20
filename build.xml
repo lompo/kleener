@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project name="Kleener" default="run">
+    <property file="${user.home}/build.properties" />
+    <property file="build.properties" />
+
+    <property name="javadoc.access" value="protected"/>
+
+    <property name="compile.extdirs" value=""/>
+    <property name="compile.debug" value="true"/>
+    <property name="compile.deprecation" value="false"/>
+    <property name="compile.optimize" value="false"/>
+
+    <property name="product" value="kleener"/>
+    <property name="version" value="0.1"/>
+    <property name="prefix" value="${product}-${version}"/>
+    <property name="testmethods" value=""/>
+
+    <target name="init" unless="path.lib">
+        <tstamp/>
+        <path id="path.lib">
+            <fileset dir="lib" includes="**/*.jar"/>
+        </path>
+        <path id="path.libdev">
+            <fileset dir="libdev" includes="**/*.jar"/>
+        </path>
+        <path id="path.main">
+            <path refid="path.lib"/>
+            <pathelement path="build/main"/>
+        </path>
+        <path id="path.test">
+            <path refid="path.main"/>
+            <path refid="path.libdev"/>
+            <pathelement path="build/test"/>
+        </path>
+    </target>
+
+    <target name="compile" depends="init" description="Compile">
+        <compile module="main" refid="path.lib"/>
+    </target>
+
+    <target name="compile-test" depends="compile" description="Compile tests">
+        <compile module="test" refid="path.main"/>
+    </target>
+
+    <macrodef name="compile">
+        <attribute name="module"/>
+        <attribute name="refid"/>
+        <attribute name="bootclasspath" default=""/>
+        <attribute name="source" default="1.5"/>
+        <attribute name="target" default="1.5"/>
+        <sequential>
+            <mkdir dir="build/@{module}"/>
+            <copy todir="build/@{module}">
+                <fileset dir="src/@{module}" excludes="**/*.java"/>
+            </copy>
+            <javac srcdir="src/@{module}" destdir="build/@{module}"
+              source="@{source}"
+              target="@{target}" bootclasspath="@{bootclasspath}" extdirs="${compile.extdirs}"
+              debug="${compile.debug}" optimize="${compile.optimize}" deprecation="${compile.deprecation}">
+                 <classpath refid="@{refid}"/>
+            </javac>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="mytest">
+        <attribute name="includes" default="**/Test*.java"/>
+        <attribute name="refid"/>
+        <attribute name="fork" default="false"/>
+        <attribute name="usefile" default="false"/>
+        <sequential>
+            <junit fork="@{fork}">
+                <sysproperty key="testmethods" value="${testmethods}"/>
+                <formatter type="brief" usefile="@{usefile}"/>
+                <classpath refid="@{refid}"/>
+                <test name="${testcase}" if="testcase"/>
+                <batchtest unless="testcase">
+                    <fileset dir="src/test" includes="@{includes}"/>
+                </batchtest>
+            </junit>
+        </sequential>
+    </macrodef>
+
+    <target name="test" depends="compile-test" description="Run JUnit tests">
+        <mytest refid="path.test" includes="com/sixlegs/kleener/Test*.java"/>
+    </target>
+
+    <target name="todo" depends="compile-test" description="Known JUnit failures">
+        <mytest refid="path.test" includes="**/*Todo.java"/>
+    </target>
+
+    <target name="run" depends="compile" description="Run Main">
+        <java classname="com.sixlegs.kleener.Main" classpathref="path.main" fork="yes"/>
+    </target>
+
+    <target name="clean" description="Clean">
+        <delete dir="build"/>
+        <delete dir="dist"/>
+    </target>
+</project>
