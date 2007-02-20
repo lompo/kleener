@@ -2,20 +2,14 @@ package com.sixlegs.kleener;
 
 import java.util.*;
 
-class LoopExp extends Expression
+class LoopExp extends UnaryExp
 {
-    private final Expression e1;
-
-    public LoopExp(Expression e1) {
-        this.e1 = e1;
-    }
-
-    protected void split(List<CharSet> csets) {
-        e1.split(csets);
+    public LoopExp(Expression child) {
+        super(child);
     }
 
     protected NFA getNFA(List<CharSet> csets) {
-        NFA n1 = e1.getNFA(csets);
+        NFA n1 = getChild().getNFA(csets);
         State s2 = new State();
         n1.getStop().addEdge(new Edge(s2));
         n1.getStop().addEdge(new Edge(n1.getStart()));
@@ -23,6 +17,7 @@ class LoopExp extends Expression
     }
 
     public String toString() {
+        Expression e1 = getChild();
         if (e1 instanceof CharClassExp)
             return e1 + "+";
         return wrap(e1) + "+";

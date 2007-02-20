@@ -2,14 +2,10 @@ package com.sixlegs.kleener;
 
 import java.util.*;
 
-class OrExp extends Expression
+class OrExp extends BinaryExp
 {
-    private final Expression e1;
-    private final Expression e2;
-
-    public OrExp(Expression e1, Expression e2) {
-        this.e1 = e1;
-        this.e2 = e2;
+    public OrExp(Expression left, Expression right) {
+        super(left, right);
     }
 
     public OrExp(Expression... e) {
@@ -20,16 +16,11 @@ class OrExp extends Expression
         this(e[index], (index + 2 == e.length) ? e[index + 1] : new OrExp(index + 1, e));
     }
 
-    protected void split(List<CharSet> csets) {
-        e1.split(csets);
-        e2.split(csets);
-    }
-
     protected NFA getNFA(List<CharSet> csets) {
         State s1 = new State();
         State s2 = new State();
-        NFA n1 = e1.getNFA(csets);
-        NFA n2 = e2.getNFA(csets);
+        NFA n1 = getLeft().getNFA(csets);
+        NFA n2 = getRight().getNFA(csets);
         s1.addEdge(new Edge(n1.getStart()));
         s1.addEdge(new Edge(n2.getStart()));
         n1.getStop().addEdge(new Edge(s2));
@@ -38,7 +29,7 @@ class OrExp extends Expression
     }
 
     public String toString() {
-        return e1 + "|" + e2;
+        return getLeft() + "|" + getRight();
     }
 
 //     protected int getLength()
