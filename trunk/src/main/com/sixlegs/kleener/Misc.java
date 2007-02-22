@@ -4,6 +4,20 @@ import java.util.*;
 
 class Misc
 {
+    public static Set<State> getStates(FA fa) {
+        Set<State> states = new HashSet<State>();
+        List<State> q = new ArrayList<State>();
+        q.add(fa.getStart());
+        while (!q.isEmpty()) {
+            State state = q.remove(q.size() - 1);
+            states.add(state);
+            for (Edge edge : state.getEdges())
+                if (!states.contains(edge.getNext()))
+                    q.add(edge.getNext());
+        }
+        return states;
+    }
+
     public static String format(Collection<CharSet> csets) {
         if (csets == null)
             return "EMPTY";
