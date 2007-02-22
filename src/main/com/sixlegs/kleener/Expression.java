@@ -4,20 +4,12 @@ import java.util.*;
 
 abstract public class Expression
 {
-    abstract protected void split(List<CharSet> csets);
-    abstract protected NFA getNFA(List<CharSet> csets);
+    abstract protected NFA getNFA();
 
 //     public static Expression parse(String pattern) {
 //         // TODO
 //         return null;
 //     }
-
-    public NFA getNFA() {
-        List<CharSet> csets = new ArrayList<CharSet>();
-        split(csets);
-        System.err.println(Misc.format(csets));
-        return getNFA(csets);
-    }
 
     /*
       0, 0 -> opt(loop(e))
@@ -50,39 +42,11 @@ abstract public class Expression
         }
     }
 
-    protected static void split(List<CharSet> csets, CharSet cset) {
-        CharSet copy = new CharSet(cset);
-        if (csets.isEmpty()) {
-            csets.add(copy);
-        } else {
-            List<CharSet> temp = new ArrayList<CharSet>();
-            for (Iterator<CharSet> it = csets.iterator(); it.hasNext();) {
-                CharSet oldSet = it.next();
-                CharSet newSet = oldSet.intersect(copy);
-                if (oldSet.isEmpty())
-                    it.remove();
-                if (!newSet.isEmpty())
-                    temp.add(newSet);
-            }
-            if (!copy.isEmpty())
-                temp.add(copy);
-            csets.addAll(temp);
-        }
+    protected Collection<CharSet> getCharSets() {
+        return Collections.emptySet();
     }
 
     protected String wrap(Expression e) {
         return "(" + e + ")";
     }
-
-//     protected boolean isFixedLength() {
-//         return false;
-//     }
-
-//     protected int getLength() {
-//         return 0;
-//     }
-
-//     NFA getNFA() throws DriverLexer.DriverException {
-//         return getNFA(new EquivMap(this));
-//     }
 }

@@ -2,10 +2,14 @@ package com.sixlegs.kleener;
 
 import java.util.*;
 
-class CatExp extends BinaryExp
+class CatExp extends Expression
 {
+    private final Expression left;
+    private final Expression right;
+
     public CatExp(Expression left, Expression right) {
-        super(left, right);
+        this.left = left;
+        this.right = right;
     }
 
     public CatExp(Expression... e) {
@@ -16,15 +20,15 @@ class CatExp extends BinaryExp
         this(e[index], (index + 2 == e.length) ? e[index + 1] : new CatExp(index + 1, e));
     }
     
-    protected NFA getNFA(List<CharSet> csets) {
-        NFA n1 = getLeft().getNFA(csets);
-        NFA n2 = getRight().getNFA(csets);
+    protected NFA getNFA() {
+        NFA n1 = left.getNFA();
+        NFA n2 = right.getNFA();
         State.merge(n1.getStop(), n2.getStart());
-        return new NFA(csets, n1.getStart(), n2.getStop());
+        return new NFA(n1.getStart(), n2.getStop());
     }
 
     public String toString() {
-        return getLeft().toString() + getRight().toString();
+        return left.toString() + right;
     }
 }
 
