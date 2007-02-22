@@ -17,6 +17,10 @@ class CharClassExp extends Expression
         this.negate = negate;
     }
 
+    @Override protected Collection<CharSet> getCharSets() {
+        return Collections.singleton(cset);
+    }
+
     // TODO: this should become part of Expression.parse
     public static CharClassExp parse(CharSequence chars) throws IOException { // TODO: get rid of exception
         boolean negate = chars.charAt(0) == '^';
@@ -56,26 +60,13 @@ class CharClassExp extends Expression
         return new CharClassExp(cset, negate);
     }
 
-    protected void split(List<CharSet> csets) {
-        split(csets, cset);
-    }
-
-    protected NFA getNFA(List<CharSet> csets) {
-        Set<CharSet> eset = getEquivSet(csets, cset);
+    protected NFA getNFA() {
         State a = new State();
         State b = new State();
-        a.addEdge(new Edge(b, eset, negate));
-        return new NFA(csets, a, b);
+        a.addEdge(new Edge(b, cset, negate));
+        return new NFA(a, b);
     }
 
-    private static Set<CharSet> getEquivSet(List<CharSet> csets, CharSet cset) {
-        Set<CharSet> eset = new HashSet<CharSet>();
-        for (CharSet check : csets)
-            if (check.containsAny(cset))
-                eset.add(check);
-        return eset;
-    }
-    
     private static final CharSet ESCAPE = new CharSet("^-");
 
     public String toString() {

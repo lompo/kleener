@@ -58,6 +58,7 @@
               target="@{target}" bootclasspath="@{bootclasspath}" extdirs="${compile.extdirs}"
               debug="${compile.debug}" optimize="${compile.optimize}" deprecation="${compile.deprecation}">
                  <classpath refid="@{refid}"/>
+                 <compilerarg value="-Xlint:unchecked"/>
             </javac>
         </sequential>
     </macrodef>

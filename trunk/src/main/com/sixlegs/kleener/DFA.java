@@ -16,9 +16,8 @@ final public class DFA extends FA implements Pattern
         while (index < length) {
             char c = chars.charAt(index++);
             for (Edge edge : state.getEdges()) {
-                State next = edge.accept(c);
-                if (next != null) {
-                    state = next;
+                if (edge.getCharSet().contains(c)) {
+                    state = edge.getNext();
                     continue BIGLOOP;
                 }
             }

@@ -5,12 +5,9 @@ import java.util.*;
 final public class NFA extends FA
 {
     private final State stop;
-    private final List<CharSet> csets;
 
-    // TODO: remove csets, collect in getDFA instead
-    NFA(List<CharSet> csets, State start, State stop) {
+    NFA(State start, State stop) {
         super(start);
-        this.csets = csets;
         this.stop = stop;
     }
 
@@ -19,6 +16,9 @@ final public class NFA extends FA
     }
     
     public DFA getDFA() {
+        List<CharSet> csets = getCharSets(getStart());
+        System.err.println(Misc.format(csets));
+        
         Set<Set<State>> seen = new HashSet<Set<State>>();
         Map<Set<State>,State> mapping = new HashMap<Set<State>,State>();
         Map<Object,Set<State>> closureCache = new HashMap<Object,Set<State>>();
@@ -35,23 +35,50 @@ final public class NFA extends FA
                 if (seen.add(U))
                     queue.add(U);
                 State U_map = getSetState(U, mapping);
-                T_map.addEdge(new Edge(U_map, Collections.singleton(cset)));
+                T_map.addEdge(new Edge(U_map, cset));
             }
         }
-        // System.err.println(mapping);
         return new DFA(mapping.get(startSet));
     }
 
+    private static List<CharSet> getCharSets(State start) {
+        final List<CharSet> csets = new ArrayList<CharSet>();
+        getCharSets(start, csets, new HashSet<State>());
+        return csets;
+    }
+
+    private static void getCharSets(State state, List<CharSet> csets, Set<State> seen) {
+        for (Edge edge : state.getEdges()) {
+            if (!edge.isEmpty()) {
+                CharSet copy = new CharSet(edge.getCharSet());
+                List<CharSet> temp = new ArrayList<CharSet>();
+                for (Iterator<CharSet> it = csets.iterator(); it.hasNext();) {
+                    CharSet oldSet = it.next();
+                    CharSet newSet = oldSet.intersect(copy);
+                    if (oldSet.isEmpty())
+                        it.remove();
+                    if (!newSet.isEmpty())
+                        temp.add(newSet);
+                }
+                if (!copy.isEmpty())
+                    temp.add(copy);
+                csets.addAll(temp);
+            }
+
+            State next = edge.getNext();
+            if (next != null && !seen.contains(next)) {
+                seen.add(state);
+                getCharSets(next, csets, seen);
+            }
+        }
+    }
 
     private static Set<State> move(Set<State> states, CharSet cset) {
         Set<State> result = new HashSet<State>();
-        for (State state : states) {
-            for (Edge edge : state.getEdges()) {
-                State next = edge.accept(cset);
-                if (next != null)
-                    result.add(next);
-            }
-        }
+        for (State state : states)
+            for (Edge edge : state.getEdges())
+                if (!edge.isEmpty() && edge.getCharSet().containsAny(cset))
+                    result.add(edge.getNext());
         return result;
     }
 

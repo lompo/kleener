@@ -5,20 +5,20 @@ import java.util.*;
 class Edge
 {
     private final State next;
-    private final Set<CharSet> csets;
+    private final CharSet cset;
     private final boolean negate;
 
     public Edge(State next) {
         this(next, null, false);
     }
 
-    public Edge(State next, Set<CharSet> csets) {
-        this(next, csets, false);
+    public Edge(State next, CharSet cset) {
+        this(next, cset, false);
     }
 
-    public Edge(State next, Set<CharSet> csets, boolean negate) {
+    public Edge(State next, CharSet cset, boolean negate) {
         this.next = next;
-        this.csets = csets;
+        this.cset = cset;
         this.negate = negate;
     }
 
@@ -31,23 +31,14 @@ class Edge
     }
     
     public boolean isEmpty() {
-        return csets == null;
+        return cset == null;
     }
 
-    public State accept(CharSet cset) {
-        return (csets != null && (csets.contains(cset) ^ negate)) ? next : null;
+    public CharSet getCharSet() {
+        return cset;
     }
-
-    public State accept(char c) {
-        if (csets != null) {
-            for (CharSet cset : csets)
-                if (cset.contains(c))
-                    return next;
-        }
-        return null;
-    }   
 
     public String toString() {
-        return "-" + Misc.format(csets) + "->" + next;
+        return "-" + Misc.format(Collections.singleton(cset)) + "->" + next;
     }
 }

@@ -11,26 +11,21 @@ class StringExp extends Expression
         chars = value.toCharArray();
     }
 
-    protected void split(List<CharSet> csets) {
+    @Override protected Collection<CharSet> getCharSets() {
+        List<CharSet> csets = new ArrayList<CharSet>();
         for (char c : chars)
-            split(csets, new CharSet(c));
+            csets.add(new CharSet(c));
+        return csets;
     }
-        
-    protected NFA getNFA(List<CharSet> csets) {
+
+    protected NFA getNFA() {
         State a = new State();
         State b = a;
         for (char c : chars)
-            b.addEdge(new Edge(b = new State(), getEquivSet(csets, c)));
-        return new NFA(csets, a, b);
+            b.addEdge(new Edge(b = new State(), new CharSet(c)));
+        return new NFA(a, b);
     }
 
-    private static Set<CharSet> getEquivSet(List<CharSet> csets, char c) {
-        for (CharSet cset : csets)
-            if (cset.contains(c))
-                return Collections.singleton(cset);
-        return Collections.emptySet();
-    }
-    
     private static final CharSet ESCAPE = new CharSet("()[]?*+|");
 
     public String toString() {
