@@ -4,10 +4,18 @@ import java.util.*;
 
 class EquivMap
 {
+    private static final Comparator<CharSet> BY_CARDINALITY = new Comparator<CharSet>(){
+        public int compare(CharSet c1, CharSet c2) {
+            return c2.cardinality() - c1.cardinality();
+        }
+    };
+        
     private final List<CharSet> csets;
     
     public EquivMap(State start) {
         csets = getCharSets(getStates(start));
+        Collections.sort(csets, BY_CARDINALITY);
+        System.err.println(Misc.format(csets));
     }
 
     public int size() {
