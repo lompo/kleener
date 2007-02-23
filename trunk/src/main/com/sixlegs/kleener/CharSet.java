@@ -36,6 +36,11 @@ final public class CharSet
         return toc.isEmpty();
     }
 
+    public int length() {
+        int index = toc.length() - 1;
+        return (index < 0) ? 0 : 256 * index + root[index].length();
+    }
+
     public int cardinality() {
         int total = 0;
         for (int i = toc.nextSetBit(0); i >= 0; i = toc.nextSetBit(i + 1))
@@ -126,6 +131,12 @@ final public class CharSet
         BitSet set = root[hibyte];
         toc.set(hibyte, set != null && !set.isEmpty());
         dirty = true;
+    }
+
+    public char nextChar(char fromChar) {
+        int index = toc.nextSetBit(fromChar >>> 8);
+        return (index == -1) ? (char)-1 :
+            (char)(256 * index + root[index].nextSetBit(fromChar & 0xFF));
     }
 
 	public boolean contains(char ch) {
