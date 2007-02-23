@@ -89,6 +89,16 @@
         <mytest refid="path.test" includes="**/*Todo.java"/>
     </target>
 
+    <target name="jar" depends="compile" description="Create jar">
+        <mkdir dir="dist"/>
+        <jar jarfile="dist/${prefix}.jar">
+            <fileset dir="build/main"/>
+            <manifest>
+                <attribute name="Implementation-Version" value="${version}"/>
+            </manifest>
+        </jar>
+    </target>
+
     <target name="run" depends="compile" description="Run Main">
         <java classname="com.sixlegs.kleener.Main" classpathref="path.main" fork="yes"/>
     </target>

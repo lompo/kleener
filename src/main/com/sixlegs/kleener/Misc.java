@@ -4,18 +4,10 @@ import java.util.*;
 
 class Misc
 {
-    public static Set<State> getStates(FA fa) {
-        Set<State> states = new HashSet<State>();
-        List<State> q = new ArrayList<State>();
-        q.add(fa.getStart());
-        while (!q.isEmpty()) {
-            State state = q.remove(q.size() - 1);
-            states.add(state);
-            for (Edge edge : state.getEdges())
-                if (!states.contains(edge.getNext()))
-                    q.add(edge.getNext());
-        }
-        return states;
+    public static String format(CharSet cset) {
+        if (cset == null)
+            return "null";
+        return "\"" + escapeStringLiteral(cset.toString()) + "\"";
     }
 
     public static String format(Collection<CharSet> csets) {
@@ -23,7 +15,7 @@ class Misc
             return "EMPTY";
         List<String> temp = new ArrayList<String>();
         for (CharSet cset : csets)
-            temp.add("\"" + escapeStringLiteral(cset.toString()) + "\"");
+            temp.add(format(cset));
         return temp.toString();
     }
 

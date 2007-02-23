@@ -2,51 +2,113 @@ package com.sixlegs.kleener;
 
 import java.util.*;
 
-abstract public class Expression
+final public class Expression
 {
-    abstract protected NFA getNFA();
+    private final State start;
+    private final List<Edge> out;
 
-//     public static Expression parse(String pattern) {
-//         // TODO
-//         return null;
-//     }
-
-    /*
-      0, 0 -> opt(loop(e))
-      0, 1 -> loop(e)
-      n, n  *build*
-      n, 0 -> cat(rep(e, n-1, n-1), loop(e))
-      0, n -> rep(opt(e, n, n))
-      m, n -> cat(rep(e, m, m), rep(e, 0, n-m))
-    */
-    static Expression repeat(Expression e1, int min, int max) {
-        if (min < 0 || max < 0 || (max < min && max != 0))
-            throw new IllegalArgumentException("min=" + min + " max=" + max);
-        if (max == 0) {
-            if (min == 0) {
-                return new OptionalExp(new LoopExp(e1));
-            } else if (min == 1) {
-                return new LoopExp(e1);
-            } else {
-                return new CatExp(repeat(e1, min - 1, min - 1), new LoopExp(e1));
-            }
-        } else if (max == min) {
-            Expression temp = e1;
-            for (int i = 1; i < min; i++) 
-                temp = new CatExp(temp, e1);
-            return temp;
-        } else if (min > 0) {
-            return new CatExp(repeat(e1, min, min), repeat(e1, 0, max - min));
-        } else {
-            return repeat(new OptionalExp(e1), max, max);
+    public Pattern compile(Pattern.Type type) {
+        switch (type) {
+        case NFA:
+            return new NFA(this);
+        case DFA:
+            return new DFA(this);
+        default:
+            throw new UnsupportedOperationException(type + " is not supported yet");
         }
     }
 
-    protected Collection<CharSet> getCharSets() {
-        return Collections.emptySet();
+    private Expression(State start, List<Edge> out) {
+        this.start = start;
+        this.out = out;
     }
 
-    protected String wrap(Expression e) {
-        return "(" + e + ")";
+    protected State getStart() {
+        return start;
+    }
+
+    protected void patch(State state) {
+        for (Edge edge : out)
+            edge.setState(state);
+    }
+
+    private static List<Edge> append(final List<Edge> left, final List<Edge> right) {
+        return new AbstractList<Edge>(){
+            public Edge get(int index) {
+                int leftSize = left.size();
+                return (index < leftSize) ? left.get(index) : right.get(index - leftSize);
+            }
+            public int size() {
+                return left.size() + right.size();
+            }
+        };
+    }
+
+    public static Expression literal(String value) {
+        Expression frag = literal(new CharSet(value.charAt(0)));
+        for (int i = 1, len = value.length(); i < len; i++)
+            frag = concat(frag, literal(new CharSet(value.charAt(i))));
+        return frag;
+    }
+
+    public static Expression literal(CharSet cset) {
+        Edge edge = new Edge();
+        return new Expression(new State(cset, edge), Collections.singletonList(edge));
+    }
+
+    public static Expression concat(Expression left, Expression right) {
+        left.patch(right.start);
+        return new Expression(left.start, right.out);
+    }
+
+    public static Expression concat(Expression... frags) {
+        return concat(0, frags);
+    }
+
+    private static Expression concat(int index, Expression[] frags) {
+        return concat(frags[index], (index + 2 == frags.length) ? frags[index + 1] : concat(index + 1, frags));
+    }
+
+    public static Expression or(Expression left, Expression right) {
+        return new Expression(new State(new Edge(left.start), new Edge(right.start)),
+                              append(left.out, right.out));
+    }
+
+    public static Expression or(Expression... frags) {
+        return or(0, frags);
+    }
+
+    private static Expression or(int index, Expression[] frags) {
+        return or(frags[index], (index + 2 == frags.length) ? frags[index + 1] : or(index + 1, frags));
+    }
+
+    public static Expression repeat(Expression e, int min, int max) {
+        if (min < 0 || max < 0 || (max < min && max != 0))
+            throw new IllegalArgumentException("min=" + min + " max=" + max);
+
+        if (((max | min) & 1) <= 1) {
+            if (max == min && max == 1)
+                return e;
+            Edge edge = new Edge();
+            State s = new State(new Edge(e.start), edge);
+            List<Edge> ptr = Collections.singletonList(edge);
+            if (max == 0) {
+                e.patch(s);
+                return (min == 0) ? new Expression(s, ptr) : new Expression(e.start, ptr);
+            } else { // min == 0, max == 1
+                return new Expression(s, append(e.out, ptr));
+            }
+        } else if (max == 0) { // min > 1, max == 0
+            return concat(repeat(e, min - 1, min - 1), repeat(e, 1, 0));
+        } else if (max == min) { // min > 1, max == min
+            Expression tmp = e;
+            for (int i = 1; i < min; i++)
+                tmp = concat(tmp, e);
+            return tmp;
+        } else if (min > 0) { // min > 0, max > min
+            return concat(repeat(e, min, min), repeat(e, 0, max - min));
+        } else { // min == 0, max > 0
+            return repeat(repeat(e, 0, 1), max, max);
+        }
     }
 }
