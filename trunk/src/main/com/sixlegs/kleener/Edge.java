@@ -1,44 +1,23 @@
 package com.sixlegs.kleener;
 
-import java.util.*;
-
-class Edge
+final class Edge
 {
-    private final State next;
-    private final CharSet cset;
-    private final boolean negate;
+    private State state;
 
-    public Edge(State next) {
-        this(next, null, false);
+    public Edge() {
     }
 
-    public Edge(State next, CharSet cset) {
-        this(next, cset, false);
+    public Edge(State state) {
+        this.state = state;
     }
 
-    public Edge(State next, CharSet cset, boolean negate) {
-        this.next = next;
-        this.cset = cset;
-        this.negate = negate;
+    public State getState() {
+        return state;
     }
 
-    public State getNext() {
-        return next;
-    }
-
-    public boolean isNegated() {
-        return negate;
-    }
-    
-    public boolean isEmpty() {
-        return cset == null;
-    }
-
-    public CharSet getCharSet() {
-        return cset;
-    }
-
-    public String toString() {
-        return "-" + Misc.format(Collections.singleton(cset)) + "->" + next;
+    public void setState(State state) {
+        if (this.state != null && this.state != state)
+            throw new IllegalStateException("Subexpressions cannot be shared across patterns");
+        this.state = state;
     }
 }

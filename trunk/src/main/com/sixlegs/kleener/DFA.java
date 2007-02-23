@@ -2,42 +2,47 @@ package com.sixlegs.kleener;
 
 import java.util.*;
 
-final public class DFA extends FA implements Pattern
+class DFA extends AbstractPattern
 {
-    DFA(State start) {
-        super(start);
+    private final Map<Set<State>,DState> dstates = Generics.newHashMap();
+    private final EquivMap equiv;
+    
+    public DFA(Expression e) {
+        super(e);
+        this.equiv = new EquivMap(start);
     }
 
     public boolean matches(CharSequence chars) {
-        int index = 0;
-        int length = chars.length();
-        State state = getStart();
-        BIGLOOP:
-        while (index < length) {
-            char c = chars.charAt(index++);
-            for (Edge edge : state.getEdges()) {
-                if (edge.getCharSet().contains(c)) {
-                    state = edge.getNext();
-                    continue BIGLOOP;
-                }
+        Set<State> newSet = Generics.newHashSet();
+        DState d = dstate(startSet(start, new HashSet<State>()));
+        DState next;
+        for (int i = 0, len = chars.length(); i < len; i++) { // TODO: short circuit?
+            char c = chars.charAt(i);
+            int index = equiv.getIndex(c);
+            if ((next = d.next[index]) == null) {
+                step(d.states, c, newSet);
+                next = d.next[index] = dstate(newSet);
             }
-            return false;
+            d = next;
         }
-        return true;
+        return isMatch(d.states);
     }
 
-    public DFA getMinimizedDFA() {
-        // TODO
-        return this;
+    private DState dstate(Set<State> set) {
+        DState d = dstates.get(set);
+        if (d == null)
+            dstates.put(set, d = new DState(set, equiv.size()));
+        return d;
     }
 
-    public Pattern compile() {
-        // TODO
-        return this;
-    }
+    private static class DState
+    {
+        final Set<State> states;
+        final DState[] next;
 
-    /*
-      char -> equiv (lookup switch?)
-      cur state + equiv -> new state (nested switch)
-    */
+        public DState(Set<State> states, int size) {
+            this.states = new HashSet<State>(states);
+            this.next = new DState[size];
+        }
+    }
 }

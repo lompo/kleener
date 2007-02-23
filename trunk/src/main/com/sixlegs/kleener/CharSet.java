@@ -3,7 +3,7 @@ package com.sixlegs.kleener;
 import java.util.*;
 
 // TODO: re-implement using intervals?
-class CharSet
+final public class CharSet
 {
     private final BitSet toc = new BitSet();
 	private final BitSet[] root = new BitSet[256];
