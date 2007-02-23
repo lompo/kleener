@@ -24,8 +24,9 @@ public class Main
         test(e, str, NFA);
         test(e, str, DFA);
 
-        e = buildCrazy(23);
-        str = repeatString("a", 23);
+        int n = 29;
+        e = buildCrazy(n);
+        str = repeatString("a", 29);
         test(e, str, NFA);
         test(e, str, DFA);
     }
