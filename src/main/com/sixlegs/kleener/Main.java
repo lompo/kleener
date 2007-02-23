@@ -19,10 +19,12 @@ public class Main
                    repeat(space(), 0, 0),
                    literal("("));
 
-        Pattern nfa = e.compile(Pattern.Type.NFA);
-        Pattern dfa = e.compile(Pattern.Type.DFA);
-        System.err.println(nfa.matches("public  int main("));
-        System.err.println(dfa.matches("public  int main("));
+        String str = "public  int main(";
+        System.err.println(e.compile(Pattern.Type.NFA).matches(str));
+        System.err.println(e.compile(Pattern.Type.DFA).matches(str));
+        System.err.println(e.compile(Pattern.Type.DFA_PRECOMPUTE).matches(str));
+        System.err.println(e.compile(Pattern.Type.DFA_OPTIMIZE).matches(str));
+        System.err.println(e.compile(Pattern.Type.DFA_COMPILE).matches(str));
     }
 
     private static Expression space() {

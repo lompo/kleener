@@ -13,9 +13,14 @@ final public class Expression
             return new NFA(this);
         case DFA:
             return new DFA(this);
-        default:
-            throw new UnsupportedOperationException(type + " is not supported yet");
+        case DFA_PRECOMPUTE:
+            return new FullDFA(this, false);
+        case DFA_OPTIMIZE:
+            return new FullDFA(this, true);
+        case DFA_COMPILE:
+            return new FullDFA(this, true).compile();
         }
+        return null;
     }
 
     private Expression(State start, List<Edge> out) {
@@ -87,7 +92,7 @@ final public class Expression
             throw new IllegalArgumentException("min=" + min + " max=" + max);
 
         if (((max | min) & 1) <= 1) {
-            if (max == min && max == 1)
+            if (min == 1 && max == 1)
                 return e;
             Edge edge = new Edge();
             State s = new State(new Edge(e.start), edge);
