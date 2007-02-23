@@ -100,7 +100,9 @@
     </target>
 
     <target name="run" depends="compile" description="Run Main">
-        <java classname="com.sixlegs.kleener.Main" classpathref="path.main" fork="yes"/>
+        <java classname="com.sixlegs.kleener.Main" classpathref="path.main" fork="yes">
+            <jvmarg value="-ea"/>
+        </java>
     </target>
 
     <target name="clean" description="Clean">
