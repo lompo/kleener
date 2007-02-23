@@ -36,6 +36,13 @@ final public class CharSet
         return toc.isEmpty();
     }
 
+    public int cardinality() {
+        int total = 0;
+        for (int i = toc.nextSetBit(0); i >= 0; i = toc.nextSetBit(i + 1))
+            total += root[i].cardinality();
+        return total;
+    }
+
     public boolean equals(Object o) {
         if (this == o)
             return true;
@@ -44,10 +51,9 @@ final public class CharSet
         CharSet other = (CharSet)o;
         if (!toc.equals(other.toc))
             return false;
-        for (int i = toc.nextSetBit(0); i >= 0; i = toc.nextSetBit(i + 1)) {
+        for (int i = toc.nextSetBit(0); i >= 0; i = toc.nextSetBit(i + 1))
             if (!root[i].equals(other.root[i]))
                 return false;
-        }
         return true;
     }
 
@@ -122,7 +128,6 @@ final public class CharSet
         dirty = true;
     }
 
-    // TODO: optimize
 	public boolean contains(char ch) {
         BitSet set = root[ch >>> 8];
         return (set != null) ? set.get(ch & 0xFF) : false;
@@ -135,7 +140,6 @@ final public class CharSet
         }
         return false;
     }
-    
 
 	private BitSet create(int hibyte) {
 		BitSet set = root[hibyte];
