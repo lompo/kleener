@@ -50,9 +50,9 @@ final public class Expression
     }
 
     public static Expression literal(String value) {
-        Expression frag = literal(new CharSet(value.charAt(0)));
+        Expression frag = literal(new SingleCharSet(value.charAt(0)));
         for (int i = 1, len = value.length(); i < len; i++)
-            frag = concat(frag, literal(new CharSet(value.charAt(i))));
+            frag = concat(frag, literal(new SingleCharSet(value.charAt(i))));
         return frag;
     }
 

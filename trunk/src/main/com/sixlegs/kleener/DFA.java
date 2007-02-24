@@ -4,6 +4,7 @@ import java.util.*;
 
 class DFA extends AbstractPattern
 {
+    // TODO: make dstates reclaimable by GC
     private final Map<Set<State>,DState> dstates = Generics.newHashMap();
     private final EquivMap equiv;
     
