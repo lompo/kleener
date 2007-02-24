@@ -10,5 +10,6 @@ public interface Pattern
         DFA_COMPILE
     };
 
+    // TODO: support surrogates
     boolean matches(CharSequence chars);
 }

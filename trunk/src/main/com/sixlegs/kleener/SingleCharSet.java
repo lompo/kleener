@@ -8,7 +8,7 @@ final public class SingleCharSet extends CharSet
         this.c = c;
     }
     
-    public boolean contains(char c) {
+    public boolean contains(int c) {
         return c == this.c;
     }
 
@@ -21,10 +21,10 @@ final public class SingleCharSet extends CharSet
     }
 
     public CharSet intersect(CharSet cset) {
-        return cset.contains((char)c) ? this : EmptyCharSet.INSTANCE;
+        return cset.contains(c) ? this : EmptyCharSet.INSTANCE;
     }
 
     public CharSet subtract(CharSet cset) {
-        return cset.contains((char)c) ? EmptyCharSet.INSTANCE : this;
+        return cset.contains(c) ? EmptyCharSet.INSTANCE : this;
     }
 }

@@ -30,19 +30,19 @@ public class CharSetBuilder
 
     public CharSetBuilder add(CharSet cset) {
         for (int c = cset.nextChar(0); c >= 0; c = cset.nextChar(c + 1))
-            add((char)c);
+            add(c);
         return this;
     }
     
-    public CharSetBuilder add(char start, char end) {
+    public CharSetBuilder add(int start, int end) {
         assert start <= end;
-        for (char c = start; c <= end; c++)
+        for (int c = start; c <= end; c++)
             add(c);
         return this;
     }
 
     // TODO: performance
-    public CharSetBuilder add(char c) {
+    public CharSetBuilder add(int c) {
         key.start = c;
         int index = Collections.binarySearch(ranges, key);
         if (index >= 0)
@@ -92,7 +92,7 @@ public class CharSetBuilder
         }
     }
 
-    private static class RangeCharSet extends CharSet
+    final private static class RangeCharSet extends CharSet
     {
         private final List<Range> ranges;
         private final int length;
@@ -103,7 +103,7 @@ public class CharSetBuilder
             length = ranges.get(ranges.size() - 1).end;
         }
 
-        public boolean contains(char c) {
+        public boolean contains(int c) {
             key.start = c;
             int index = Collections.binarySearch(ranges, key);
             if (index >= 0)
@@ -134,8 +134,8 @@ public class CharSetBuilder
             // TODO: knowing cardinality would help here (want to iterate over smaller one)
             CharSetBuilder builder = new CharSetBuilder();
             for (int c = cset.nextChar(0); c >= 0; c = cset.nextChar(c + 1)) {
-                if (contains((char)c))
-                    builder.add((char)c);
+                if (contains(c))
+                    builder.add(c);
             }
             return builder.build();
         }
@@ -146,8 +146,8 @@ public class CharSetBuilder
                 return this;
             CharSetBuilder builder = new CharSetBuilder();
             for (int c = nextChar(0); c >= 0; c = nextChar(c + 1)) {
-                if (!cset.contains((char)c))
-                    builder.add((char)c);
+                if (!cset.contains(c))
+                    builder.add(c);
             }
             return builder.build();
         }

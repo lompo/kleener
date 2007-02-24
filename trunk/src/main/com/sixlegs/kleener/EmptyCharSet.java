@@ -4,7 +4,7 @@ final public class EmptyCharSet extends CharSet
 {
     public static final EmptyCharSet INSTANCE = new EmptyCharSet();
 
-    public boolean contains(char c) {
+    public boolean contains(int c) {
         return false;
     }
 
