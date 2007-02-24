@@ -4,21 +4,6 @@ import java.util.*;
 
 class Misc
 {
-    public static String format(CharSet cset) {
-        if (cset == null)
-            return "null";
-        return "\"" + escapeStringLiteral(cset.toString()) + "\"";
-    }
-
-    public static String format(Collection<CharSet> csets) {
-        if (csets == null)
-            return "EMPTY";
-        List<String> temp = new ArrayList<String>();
-        for (CharSet cset : csets)
-            temp.add(format(cset));
-        return temp.toString();
-    }
-
     public static String escapeChars(String value, CharSet cset)
     {
         StringBuilder sb = new StringBuilder();
