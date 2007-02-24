@@ -17,11 +17,9 @@
 
     <target name="init" unless="path.lib">
         <tstamp/>
+        <taskdef name="testng" classpathref="path.lib" classname="org.testng.TestNGAntTask"/>
         <path id="path.lib">
             <fileset dir="lib" includes="**/*.jar"/>
-        </path>
-        <path id="path.libdev">
-            <fileset dir="libdev" includes="**/*.jar"/>
         </path>
         <path id="path.main">
             <path refid="path.lib"/>
@@ -29,7 +27,6 @@
         </path>
         <path id="path.test">
             <path refid="path.main"/>
-            <path refid="path.libdev"/>
             <pathelement path="build/test"/>
         </path>
     </target>
@@ -66,27 +63,19 @@
     <macrodef name="mytest">
         <attribute name="includes" default="**/Test*.java"/>
         <attribute name="refid"/>
-        <attribute name="fork" default="false"/>
-        <attribute name="usefile" default="false"/>
         <sequential>
-            <junit fork="@{fork}">
-                <sysproperty key="testmethods" value="${testmethods}"/>
-                <formatter type="brief" usefile="@{usefile}"/>
-                <classpath refid="@{refid}"/>
-                <test name="${testcase}" if="testcase"/>
-                <batchtest unless="testcase">
-                    <fileset dir="src/test" includes="@{includes}"/>
-                </batchtest>
-            </junit>
+            <testng classpathref="@{refid}">
+                <classfileset dir="build/test" includes="@{includes}"/>
+            </testng>
         </sequential>
     </macrodef>
 
     <target name="test" depends="compile-test" description="Run JUnit tests">
-        <mytest refid="path.test" includes="com/sixlegs/kleener/Test*.java"/>
+        <mytest refid="path.test" includes="com/sixlegs/kleener/Test*.class"/>
     </target>
 
     <target name="todo" depends="compile-test" description="Known JUnit failures">
-        <mytest refid="path.test" includes="**/*Todo.java"/>
+        <mytest refid="path.test" includes="**/*Todo.class"/>
     </target>
 
     <target name="jar" depends="compile" description="Create jar">
