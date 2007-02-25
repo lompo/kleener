@@ -35,6 +35,18 @@ public class Main
         test(buildCrazy(29), repeatString("a", 29), DFA, 1);
         test(buildCrazy(100), repeatString("a", 100), NFA, 1);
         test(buildCrazy(100), repeatString("a", 100), DFA, 1);
+
+        List<Long> times = new ArrayList<Long>();
+        for (int n = 1; n <= 100; n++) {
+            Pattern p = buildCrazy(n).compile(NFA);
+            String str = repeatString("a", n);
+            long t = System.nanoTime();
+            if (p.matches(str) == null)
+                throw new IllegalStateException("expected match");
+            t = System.nanoTime() - t;
+            times.add(t / 1000);
+        }
+        System.err.println(times);
     }
 
     private static Expression buildCrazy(int n) {
@@ -59,7 +71,7 @@ public class Main
         long t1 = System.currentTimeMillis();
         MatchResult result = p.matches(str);
         if (result == null)
-            throw new IllegalArgumentException("does not match");
+            throw new IllegalStateException("expected match");
         for (int i = 1; i < count; i++)
             p.matches(str);        
         long t2 = System.currentTimeMillis();
