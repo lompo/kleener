@@ -17,7 +17,7 @@ public class CharSetBuilder
             return start - r.start;
         }
 
-        public String toString() {
+        @Override public String toString() {
             return "[" + start + ", " + end + "]";
         }
     }

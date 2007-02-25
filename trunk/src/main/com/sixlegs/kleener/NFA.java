@@ -11,11 +11,11 @@ class NFA extends AbstractPattern
     public MatchResult matches(CharSequence chars) {
         Sub[] match = new Sub[parenCount];
         int p = 0;
-        Map<State,Sub[]> clist = Generics.newHashMap();
-        Map<State,Sub[]> nlist = Generics.newHashMap();
-        Map<State,Sub[]> t;
+        Sub[][] clist = new Sub[stateCount][];
+        Sub[][] nlist = new Sub[stateCount][];
+        Sub[][] t;
         startSet(p, clist);
-        for (int len = chars.length(); p < len && !clist.isEmpty(); p++) {
+        for (int len = chars.length(); p < len; p++) { // TODO: short circuit
             step(clist, chars.charAt(p), p + 1, nlist, match);
             t = clist; clist = nlist; nlist = t; // swap
         }

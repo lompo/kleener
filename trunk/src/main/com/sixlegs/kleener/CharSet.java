@@ -15,7 +15,7 @@ abstract public class CharSet
         return nextChar(0) < 0;
     }
 
-    public String toString() {
+    @Override public String toString() {
         StringBuilder sb = new StringBuilder();
         for (int c = nextChar(0); c >= 0; c = nextChar(c + 1))
             sb.appendCodePoint(c);

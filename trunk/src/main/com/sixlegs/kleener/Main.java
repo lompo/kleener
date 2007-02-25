@@ -24,26 +24,17 @@ public class Main
                          repeat(literal(SPACE), 0, 0),
                          literal("(")), 0);
 
-        String str = "public  int main(";
-        test(e, str, NFA, 10000);
-        test(e, str, DFA, 10000);
+        String str1 = "public  int main(";
+        String str2 = " private void foo (";
+        
+        test(e, str1, NFA, 10000);
+        test(e, str2, NFA, 1);
+        test(e, str1, DFA, 10000);
+        test(e, str2, DFA, 1);
         test(buildCrazy(29), repeatString("a", 29), NFA, 1);
         test(buildCrazy(29), repeatString("a", 29), DFA, 1);
         test(buildCrazy(100), repeatString("a", 100), NFA, 1);
         test(buildCrazy(100), repeatString("a", 100), DFA, 1);
-        
-        /*
-        List<Long> times = new ArrayList<Long>();
-        for (int n = 1; n <= 100; n++) {
-            Pattern p = buildCrazy(n).compile(NFA);
-            str = repeatString("a", 29);
-            long t = System.nanoTime();
-            p.matches(str);
-            t = System.nanoTime() - t;
-            times.add(t / 1000);
-        }
-        System.err.println(times);
-        */
     }
 
     private static Expression buildCrazy(int n) {
