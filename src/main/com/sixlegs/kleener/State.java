@@ -10,15 +10,17 @@ final class State
         Match
     };
     
-    volatile private static int ids;
     public static final State MATCH = new State(Op.Match, 0, null, null, null);
+    static {
+        MATCH.setId(0);
+    }
 
-    private final int id = ids++;
     private final Op op;
     private final int data;
     private final CharSet cset;
     private final Edge edge1;
     private final Edge edge2;
+    private int id = -1;
 
     public static State charSet(CharSet cset, Edge edge) {
         assert cset != null && edge != null;
@@ -68,7 +70,17 @@ final class State
         return (edge2 != null) ? edge2.getState() : null;
     }
     
-    public String toString() {
+    @Override public String toString() {
         return String.valueOf(id);
+    }
+
+    public void setId(int id) {
+        if (this.id != -1 && this.id != id)
+            throw new IllegalStateException("Subexpressions cannot be shared across patterns");
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 }

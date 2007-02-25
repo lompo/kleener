@@ -18,6 +18,7 @@ final public class Expression
     }
 
     private Expression(State start, List<Edge> out) {
+        assert !out.isEmpty();
         this.start = start;
         this.out = out;
     }

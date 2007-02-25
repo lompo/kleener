@@ -5,37 +5,51 @@ import java.util.*;
 abstract class AbstractPattern implements Pattern
 {
     private static final Sub EMPTY_SUB = new Sub(-1, -1);
-    private static final Map<State,Sub[]> EMPTY_THREADS = Collections.emptyMap();
+    private static final Sub START_SUB = new Sub(0, -1);
+    private static final Sub[][] EMPTY = {};
 
     protected final State start;
+    protected final int stateCount;
     protected final int parenCount;
+    private final State[] states;
 
     public AbstractPattern(Expression e) {
         if (e.getStart().getOp() != State.Op.LParen)
             throw new IllegalArgumentException("Outer expression must be paren");
         this.start = e.getStart();
-        this.parenCount = count(start, new HashSet<State>());
         e.patch(State.MATCH);
+
+        int[] counts = new int[2];
+        Set<State> states = new LinkedHashSet<State>();
+        states.add(State.MATCH);
+        
+        this.parenCount = visit(start, states);
+        this.stateCount = states.size();
+        this.states = states.toArray(new State[stateCount]);
+        System.err.println("stateCount=" + stateCount + " parenCount=" + parenCount);
     }
 
-    private static int count(State state, Set<State> mark) {
+    private static int visit(State state, Set<State> mark) {
         if (state == null || mark.contains(state))
             return 0;
+        state.setId(mark.size());
         mark.add(state);
         return ((state.getOp() == State.Op.LParen) ? 1 : 0) +
-            count(state.getState1(), mark) +
-            count(state.getState2(), mark);
+            visit(state.getState1(), mark) +
+            visit(state.getState2(), mark);
     }
 
-    protected void startSet(int p, Map<State,Sub[]> threads) {
-        step(EMPTY_THREADS, 0, p, threads, new Sub[parenCount]);
+    protected void startSet(int p, Sub[][] threads) {
+        step(EMPTY, 0, p, threads, new Sub[parenCount]);
     }
 
-    protected void step(Map<State,Sub[]> clist, int c, int p, Map<State,Sub[]> nlist, Sub[] match) {
-        // System.err.println("p=" + p + " c='" + (char)c + "' match=" + match + " clist=" + clist);
-        nlist.clear();
-        for (State state : clist.keySet()) {
-            Sub[] tmatch = clist.get(state);
+    protected void step(Sub[][] clist, int c, int p, Sub[][] nlist, Sub[] match) {
+        Arrays.fill(nlist, null);
+        for (int i = 0; i < clist.length; i++) {
+            Sub[] tmatch = clist[i];
+            if (tmatch == null)
+                continue;
+            State state = states[i];
             switch (state.getOp()) {
             case CharSet:
                 if (state.getCharSet().contains(c))
@@ -50,15 +64,15 @@ abstract class AbstractPattern implements Pattern
             addState(nlist, start, new Sub[parenCount], p);
     }
 
-    private void addState(Map<State,Sub[]> threads, State state, Sub[] match, int p) {
+    private void addState(Sub[][] threads, State state, Sub[] match, int p) {
         if (state == null)
             return;
-        if (threads.containsKey(state))
+        int id = state.getId();
+        if (threads[id] != null)
             return;
 
-        Sub[] tmatch = new Sub[parenCount];
-        System.arraycopy(match, 0, tmatch, 0, parenCount);
-        threads.put(state, tmatch);
+        threads[id] = new Sub[parenCount];
+        System.arraycopy(match, 0, threads[id], 0, parenCount);
         
         switch (state.getOp()) {
         case Match:
@@ -72,7 +86,7 @@ abstract class AbstractPattern implements Pattern
             int data = state.getData();
             Sub save = match[data];
             match[data] = (state.getOp() == State.Op.LParen) ?
-                new Sub(p, -1) :
+                ((p == 0) ? START_SUB : new Sub(p, -1)) :
                 new Sub(save.sp, p);
             addState(threads, state.getState1(), match, p);
             match[data] = save;

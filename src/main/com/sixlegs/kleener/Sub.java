@@ -10,7 +10,7 @@ class Sub
         this.ep = ep;
     }
 
-    public String toString() {
+    @Override public String toString() {
         return "{" + sp + "," + ep + "}";
     }
 
@@ -19,6 +19,8 @@ class Sub
     }
 
     @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
         if (!(o instanceof Sub))
             return false;
         Sub sub = (Sub)o;

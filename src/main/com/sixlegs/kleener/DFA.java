@@ -16,12 +16,12 @@ class DFA extends AbstractPattern
     public MatchResult matches(CharSequence chars) {
         Sub[] match = new Sub[parenCount];
         int p = 0;
-        Map<State,Sub[]> clist = Generics.newHashMap();
-        Map<State,Sub[]> nlist = Generics.newHashMap();
+        Sub[][] clist = new Sub[stateCount][];
+        Sub[][] nlist = new Sub[stateCount][];
         startSet(p, clist);
         DState d = dstate(clist);
         DState next;
-        for (int len = chars.length(); p < len; p++) { // TODO: short circuit?
+        for (int len = chars.length(); p < len; p++) { // TODO: short circuit
             char c = chars.charAt(p);
             int index = equiv.getIndex(c);
             if ((next = d.next[index]) == null) {
@@ -34,29 +34,56 @@ class DFA extends AbstractPattern
         return getResult(chars, match);
     }
 
-    private DState dstate(Map<State,Sub[]> threads) {
-        Object key = getKey(threads);
+    private DState dstate(Sub[][] threads) {
+        Object key = new DeepKey(threads);
         DState d = dstates.get(key);
-        if (d == null)
-            dstates.put(key, d = new DState(threads, equiv.size()));
+        if (d == null) {
+            threads = threads.clone(); // TODO: deep clone necessary?
+            dstates.put(new DeepKey(threads, key.hashCode()),
+                        d = new DState(threads, equiv.size()));
+        }
         return d;
-    }
-
-    private static Object getKey(Map<State,Sub[]> threads) {
-        Map<State,List<Sub>> key = Generics.newHashMap();
-        for (State state : threads.keySet())
-            key.put(state, Arrays.asList(threads.get(state)));
-        return key;
     }
 
     private static class DState
     {
-        final Map<State,Sub[]> threads;
+        final Sub[][] threads;
         final DState[] next;
 
-        public DState(Map<State,Sub[]> threads, int size) {
-            this.threads = new HashMap<State,Sub[]>(threads);
+        public DState(Sub[][] threads, int size) {
+            this.threads = threads;
             this.next = new DState[size];
+        }
+    }
+
+    private static class DeepKey
+    {
+        private final Object[] a;
+        private final int hashCode;
+
+        public DeepKey(Object[] a) {
+            this(a, Arrays.deepHashCode(a));
+        }
+
+        public DeepKey(Object[] a, int hashCode) {
+            this.a = a;
+            this.hashCode = hashCode;
+        }
+        
+        @Override public int hashCode() {
+            return hashCode;
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (!(o instanceof DeepKey))
+                return false;
+            return Arrays.deepEquals(a, ((DeepKey)o).a);
+        }
+
+        @Override public String toString() {
+            return Arrays.deepToString(a);
         }
     }
 }
