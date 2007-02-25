@@ -1,15 +1,18 @@
 package com.sixlegs.kleener;
 
+import java.util.List;
+
 public interface Pattern
 {
-    public enum Type {
-        NFA,
-        DFA,
-        DFA_PRECOMPUTE,
-        DFA_OPTIMIZE,
-        DFA_COMPILE
+    public enum MatchType {
+        LeftmostBiased,
+        LeftmostLongest,
     };
 
-    // TODO: support surrogates
-    boolean matches(CharSequence chars);
+    public enum CompileType {
+        NFA,
+        DFA,
+    };
+
+    MatchResult matches(CharSequence chars);
 }

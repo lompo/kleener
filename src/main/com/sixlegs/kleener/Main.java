@@ -1,7 +1,7 @@
 package com.sixlegs.kleener;
 
 import static com.sixlegs.kleener.Expression.*;
-import static com.sixlegs.kleener.Pattern.Type.*;
+import static com.sixlegs.kleener.Pattern.CompileType.*;
 import java.util.*;
 
 public class Main
@@ -14,23 +14,28 @@ public class Main
 
     public static void main(String[] args) throws Exception {
         Expression e =
-            concat(repeat(or(literal("public"),
-                             literal("private"),
-                             literal("protected")), 0, 1),
-                   repeat(literal(SPACE), 0, 0),
-                   repeat(literal(ALNUM), 1, 0),
-                   repeat(literal(SPACE), 1, 0),
-                   repeat(literal(ALNUM), 1, 0),
-                   repeat(literal(SPACE), 0, 0),
-                   literal("("));
+            paren(concat(repeat(paren(or(literal("public"),
+                                         literal("private"),
+                                         literal("protected")), 1), 0, 1),
+                         repeat(literal(SPACE), 0, 0),
+                         paren(repeat(literal(ALNUM), 1, 0), 2),
+                         repeat(literal(SPACE), 1, 0),
+                         paren(repeat(literal(ALNUM), 1, 0), 3),
+                         repeat(literal(SPACE), 0, 0),
+                         literal("(")), 0);
 
         String str = "public  int main(";
-        test(e, str, NFA);
-        test(e, str, DFA);
-
+        test(e, str, NFA, 10000);
+        test(e, str, DFA, 10000);
+        test(buildCrazy(29), repeatString("a", 29), NFA, 1);
+        test(buildCrazy(29), repeatString("a", 29), DFA, 1);
+        test(buildCrazy(100), repeatString("a", 100), NFA, 1);
+        test(buildCrazy(100), repeatString("a", 100), DFA, 1);
+        
+        /*
         List<Long> times = new ArrayList<Long>();
         for (int n = 1; n <= 100; n++) {
-            Pattern p = buildCrazy(n).compile(DFA);
+            Pattern p = buildCrazy(n).compile(NFA);
             str = repeatString("a", 29);
             long t = System.nanoTime();
             p.matches(str);
@@ -38,6 +43,7 @@ public class Main
             times.add(t / 1000);
         }
         System.err.println(times);
+        */
     }
 
     private static Expression buildCrazy(int n) {
@@ -46,7 +52,7 @@ public class Main
         for (int i = 0; i < n; i++)
             array[i] = repeat(literal("a"), 0, 1);
         array[n] = literal(repeatString("a", n));
-        return concat(array);
+        return paren(concat(array), 0);
     }
 
     private static String repeatString(String s, int n) {
@@ -56,15 +62,19 @@ public class Main
         return sb.toString();
     }
 
-    private static final int COUNT = 10000;
-    private static void test(Expression e, String str, Pattern.Type type) {
+    private static void test(Expression e, String str, Pattern.CompileType type, int count) {
         long t0 = System.currentTimeMillis();
         Pattern p = e.compile(type);
         long t1 = System.currentTimeMillis();
-        for (int i = 0; i < COUNT; i++)
-            if (!p.matches(str))
-                throw new IllegalArgumentException("does not match");
+        MatchResult result = p.matches(str);
+        if (result == null)
+            throw new IllegalArgumentException("does not match");
+        for (int i = 1; i < count; i++)
+            p.matches(str);        
         long t2 = System.currentTimeMillis();
-        System.err.println(type + " compile=" + (t1 - t0) + " run=" + (t2 - t1) + " (" + COUNT + " iterations)");
+        
+        for (int group = 0; group <= result.groupCount(); group++)
+            System.err.println("group " + group + ": >>>" + result.group(group) + "<<<");
+        System.err.println(type + " compile=" + (t1 - t0) + " run=" + (t2 - t1) + " (" + count + " iterations)");
     }
 }

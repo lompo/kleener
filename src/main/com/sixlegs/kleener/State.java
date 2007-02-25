@@ -2,30 +2,59 @@ package com.sixlegs.kleener;
 
 final class State
 {
-    public static final State MATCH = new State(null, null, null);
+    public enum Op {
+        CharSet,
+        Split,
+        LParen,
+        RParen,
+        Match
+    };
     
     volatile private static int ids;
-    private final int id = ids++;
+    public static final State MATCH = new State(Op.Match, 0, null, null, null);
 
+    private final int id = ids++;
+    private final Op op;
+    private final int data;
     private final CharSet cset;
     private final Edge edge1;
     private final Edge edge2;
 
-    public State(CharSet cset, Edge edge1) {
-        this(cset, edge1, null);
-        assert cset != null && edge1 != null;
+    public static State charSet(CharSet cset, Edge edge) {
+        assert cset != null && edge != null;
+        return new State(Op.CharSet, 0, cset, edge, null);
     }
 
-    public State(Edge edge1, Edge edge2) {
-        this(null, edge1, edge2);
+    public static State lParen(int data, Edge edge) {
+        assert edge != null;
+        return new State(Op.LParen, data, null, edge, null);
+    }
+
+    public static State rParen(int data, Edge edge) {
+        assert edge != null;
+        return new State(Op.RParen, data, null, edge, null);
+    }
+
+    public static State split(Edge edge1, Edge edge2) {
         assert edge1 != null && edge2 != null;
+        return new State(Op.Split, 0, null, edge1, edge2);
     }
     
-    private State(CharSet cset, Edge edge1, Edge edge2) {
+    private State(Op op, int data, CharSet cset, Edge edge1, Edge edge2) {
+        this.op = op;
+        this.data = data;
         this.cset = cset;
         this.edge1 = edge1;
         this.edge2 = edge2;
     }
+
+    public Op getOp() {
+        return op;
+    }
+
+    public int getData() {
+        return data;
+    }        
 
     public CharSet getCharSet() {
         return cset;

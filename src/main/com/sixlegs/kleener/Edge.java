@@ -20,4 +20,5 @@ final class Edge
             throw new IllegalStateException("Subexpressions cannot be shared across patterns");
         this.state = state;
     }
+
 }
