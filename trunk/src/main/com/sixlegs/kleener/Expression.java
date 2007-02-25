@@ -7,18 +7,12 @@ final public class Expression
     private final State start;
     private final List<Edge> out;
 
-    public Pattern compile(Pattern.Type type) {
+    public Pattern compile(Pattern.CompileType type) {
         switch (type) {
         case NFA:
             return new NFA(this);
         case DFA:
             return new DFA(this);
-        case DFA_PRECOMPUTE:
-            return new FullDFA(this, false);
-        case DFA_OPTIMIZE:
-            return new FullDFA(this, true);
-        case DFA_COMPILE:
-            return new FullDFA(this, true).compile();
         }
         return null;
     }
@@ -58,7 +52,7 @@ final public class Expression
 
     public static Expression literal(CharSet cset) {
         Edge edge = new Edge();
-        return new Expression(new State(cset, edge), Collections.singletonList(edge));
+        return new Expression(State.charSet(cset, edge), Collections.singletonList(edge));
     }
 
     public static Expression concat(Expression left, Expression right) {
@@ -75,7 +69,7 @@ final public class Expression
     }
 
     public static Expression or(Expression left, Expression right) {
-        return new Expression(new State(new Edge(left.start), new Edge(right.start)),
+        return new Expression(State.split(new Edge(left.start), new Edge(right.start)),
                               append(left.out, right.out));
     }
 
@@ -95,7 +89,7 @@ final public class Expression
             if (min == 1 && max == 1)
                 return e;
             Edge edge = new Edge();
-            State s = new State(new Edge(e.start), edge);
+            State s = State.split(new Edge(e.start), edge);
             List<Edge> ptr = Collections.singletonList(edge);
             if (max == 0) {
                 e.patch(s);
@@ -115,5 +109,11 @@ final public class Expression
         } else { // min == 0, max > 0
             return repeat(repeat(e, 0, 1), max, max);
         }
+    }
+
+    public static Expression paren(Expression e, int n) {
+        Edge edge = new Edge();
+        e.patch(State.rParen(n, edge));
+        return new Expression(State.lParen(n, new Edge(e.start)), Collections.singletonList(edge));
     }
 }
