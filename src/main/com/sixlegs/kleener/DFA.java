@@ -15,11 +15,10 @@ class DFA extends AbstractPattern
 
     public MatchResult matches(CharSequence chars) {
         Sub[] match = new Sub[parenCount];
-        int p = 0;
-        Sub[][] clist = new Sub[stateCount][];
         Sub[][] nlist = new Sub[stateCount][];
-        startSet(p, clist);
-        DState d = dstate(clist);
+        int p = 0;
+        startSet(0, nlist);
+        DState d = dstate(nlist);
         DState next;
         for (int len = chars.length(); p < len; p++) { // TODO: short circuit
             char c = chars.charAt(p);
