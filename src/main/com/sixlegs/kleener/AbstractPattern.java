@@ -26,7 +26,6 @@ abstract class AbstractPattern implements Pattern
         this.parenCount = visit(start, states);
         this.stateCount = states.size();
         this.states = states.toArray(new State[stateCount]);
-        System.err.println("stateCount=" + stateCount + " parenCount=" + parenCount);
     }
 
     private static int visit(State state, Set<State> mark) {
@@ -94,7 +93,6 @@ abstract class AbstractPattern implements Pattern
     }
 
     protected static MatchResult getResult(final CharSequence chars, final Sub[] match) {
-        // System.err.println(Arrays.asList(match));
         if (match[0] == null || match[0].sp < 0)
             return null;
         return new MatchResult() {
