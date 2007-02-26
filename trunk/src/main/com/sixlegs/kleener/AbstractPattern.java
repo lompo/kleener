@@ -1,6 +1,7 @@
 package com.sixlegs.kleener;
 
 import java.util.*;
+import java.util.regex.MatchResult;
 
 abstract class AbstractPattern implements Pattern
 {
@@ -108,6 +109,18 @@ abstract class AbstractPattern implements Pattern
             }
             public String group(int group) {
                 return chars.subSequence(match[group].sp, match[group].ep).toString();
+            }
+            public int start() {
+                return 0;
+            }
+            public int end() {
+                return chars.length();
+            }
+            public int start(int group) {
+                return match[group].sp;
+            }
+            public int end(int group) {
+                return match[group].ep;
             }
         };
     }

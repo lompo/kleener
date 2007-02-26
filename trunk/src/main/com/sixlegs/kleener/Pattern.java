@@ -1,6 +1,7 @@
 package com.sixlegs.kleener;
 
 import java.util.List;
+import java.util.regex.MatchResult;
 
 public interface Pattern
 {
