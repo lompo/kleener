@@ -3,46 +3,63 @@ package com.sixlegs.kleener;
 import java.util.*;
 import java.util.regex.MatchResult;
 
-class DFA extends AbstractPattern
+class DFA extends PatternHelper
 {
-    // TODO: make dstates reclaimable by GC
-    private final Map<Object,DState> dstates = Generics.newHashMap();
     private final EquivMap equiv;
+
+    // TODO: make dstates reclaimable by GC
+    // TODO: synchronization
+    private final Map<Object,DState> dstates = Generics.newHashMap();
     
-    public DFA(Expression e) {
-        super(e);
+    public DFA(String regex, Expression e) {
+        super(regex, e);
         this.equiv = new EquivMap(start);
     }
 
-    public MatchResult matches(CharSequence chars) {
-        Sub[] match = new Sub[parenCount];
-        Sub[][] nlist = new Sub[stateCount][];
-        int p = 0;
-        startSet(0, nlist);
-        DState d = dstate(nlist);
-        DState next;
-        for (int len = chars.length(); p < len; p++) { // TODO: short circuit
-            char c = chars.charAt(p);
-            int index = equiv.getIndex(c);
-            if ((next = d.next[index]) == null) {
-                step(d.threads, c, p + 1, nlist, match);
-                next = d.next[index] = dstate(nlist);
-            }
-            d = next;
-        }
-        step(d.threads, 0, p, nlist, match);
-        return getResult(chars, match);
+    protected Matcher createMatcher() {
+        return new DFAMatcher(this, equiv, dstates);
     }
 
-    private DState dstate(Sub[][] threads) {
-        Object key = new DeepKey(threads);
-        DState d = dstates.get(key);
-        if (d == null) {
-            threads = threads.clone(); // TODO: deep clone necessary?
-            dstates.put(new DeepKey(threads, key.hashCode()),
-                        d = new DState(threads, equiv.size()));
+    private static class DFAMatcher extends Matcher
+    {
+        private final Sub[][] nlist;
+        private final EquivMap equiv;
+        private final Map<Object,DState> dstates;
+
+        public DFAMatcher(DFA pattern, EquivMap equiv, Map<Object,DState> dstates) {
+            super(pattern);
+            nlist = new Sub[pattern.stateCount][];
+            this.equiv = equiv;
+            this.dstates = dstates;
         }
-        return d;
+        
+        protected boolean match(int p) {
+            pattern.startSet(p, nlist);
+            DState d = dstate(nlist);
+            DState next;
+            for (int len = input.length(); p < len; p++) { // TODO: short circuit
+                char c = input.charAt(p);
+                int index = equiv.getIndex(c);
+                if ((next = d.next[index]) == null) {
+                    pattern.step(d.threads, c, p + 1, nlist, match);
+                    next = d.next[index] = dstate(nlist);
+                }
+                d = next;
+            }
+            pattern.step(d.threads, 0, p, nlist, match);
+            return updateMatch();
+        }
+
+        private DState dstate(Sub[][] threads) {
+            Object key = new DeepKey(threads);
+            DState d = dstates.get(key);
+            if (d == null) {
+                threads = threads.clone(); // TODO: deep clone necessary?
+                dstates.put(new DeepKey(threads, key.hashCode()),
+                            d = new DState(threads, equiv.size()));
+            }
+            return d;
+        }
     }
 
     private static class DState

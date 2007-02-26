@@ -2,17 +2,17 @@ package com.sixlegs.kleener;
 
 import java.util.*;
 
-final public class Expression
+final class Expression
 {
     private final State start;
     private final List<Edge> out;
 
-    public Pattern compile(Pattern.CompileType type) {
+    public Pattern compile(String regex, Pattern.CompileType type) {
         switch (type) {
         case NFA:
-            return new NFA(this);
+            return new NFA(regex, this);
         case DFA:
-            return new DFA(this);
+            return new DFA(regex, this);
         }
         return null;
     }

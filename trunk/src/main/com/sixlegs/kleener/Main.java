@@ -39,10 +39,10 @@ public class Main
 
         List<Long> times = new ArrayList<Long>();
         for (int n = 1; n <= 100; n++) {
-            Pattern p = buildCrazy(n).compile(NFA);
+            Pattern p = buildCrazy(n).compile(null, NFA);
             String str = repeatString("a", n);
             long t = System.nanoTime();
-            if (p.matches(str) == null)
+            if (!p.matcher(str).matches())
                 throw new IllegalStateException("expected match");
             t = System.nanoTime() - t;
             times.add(t / 1000);
@@ -67,17 +67,17 @@ public class Main
 
     private static void test(Expression e, String str, Pattern.CompileType type, int count) {
         long t0 = System.currentTimeMillis();
-        Pattern p = e.compile(type);
+        Pattern p = e.compile(null, type);
         long t1 = System.currentTimeMillis();
-        MatchResult result = p.matches(str);
-        if (result == null)
+        Matcher matcher = p.matcher(str);
+        if (!matcher.matches())
             throw new IllegalStateException("expected match");
         for (int i = 1; i < count; i++)
-            p.matches(str);        
+            matcher.matches();
         long t2 = System.currentTimeMillis();
         
-        for (int group = 0; group <= result.groupCount(); group++)
-            System.err.println("group " + group + ": >>>" + result.group(group) + "<<<");
+        for (int group = 0; group <= matcher.groupCount(); group++)
+            System.err.println("group " + group + ": >>>" + matcher.group(group) + "<<<");
         System.err.println(type + " compile=" + (t1 - t0) + " run=" + (t2 - t1) + " (" + count + " iterations)");
     }
 }
