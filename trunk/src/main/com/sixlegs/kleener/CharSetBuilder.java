@@ -4,22 +4,19 @@ import java.util.*;
 
 public class CharSetBuilder
 {
+    private static final Comparator START_COMPARATOR = new Comparator<Range>(){
+        public int compare(Range r1, Range r2) {
+            return r1.start - r2.start;
+        }
+    };
+
     private final List<Range> ranges = Generics.newArrayList();
     private final Range key = new Range();
     
     private static class Range
-    implements Comparable<Range>
     {
         int start;
         int end;
-        
-        public int compareTo(Range r) {
-            return start - r.start;
-        }
-
-        @Override public String toString() {
-            return "[" + start + ", " + end + "]";
-        }
     }
 
     public CharSetBuilder add(CharSequence chars) {
@@ -44,7 +41,7 @@ public class CharSetBuilder
     // TODO: performance
     public CharSetBuilder add(int c) {
         key.start = c;
-        int index = Collections.binarySearch(ranges, key);
+        int index = Collections.binarySearch(ranges, key, START_COMPARATOR);
         if (index >= 0)
             return this;
         index = -(index + 1);
@@ -95,17 +92,15 @@ public class CharSetBuilder
     final private static class RangeCharSet extends CharSet
     {
         private final List<Range> ranges;
-        private final int length;
         private final Range key = new Range();
         
         public RangeCharSet(List<Range> ranges) {
             this.ranges = ranges;
-            length = ranges.get(ranges.size() - 1).end;
         }
 
         public boolean contains(int c) {
             key.start = c;
-            int index = Collections.binarySearch(ranges, key);
+            int index = Collections.binarySearch(ranges, key, START_COMPARATOR);
             if (index >= 0)
                 return true;
             if (index == -1)
@@ -116,7 +111,7 @@ public class CharSetBuilder
 
         public int nextChar(int c) {
             key.start = c;
-            int index = Collections.binarySearch(ranges, key);
+            int index = Collections.binarySearch(ranges, key, START_COMPARATOR);
             if (index >= 0)
                 return c;
             index = -(index + 1);

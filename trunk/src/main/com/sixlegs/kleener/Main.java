@@ -51,7 +51,6 @@ public class Main
 
     private static Expression buildCrazy(int n) {
         Expression[] array = new Expression[n + 1];
-        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n; i++)
             array[i] = repeat(literal("a"), 0, 1);
         array[n] = literal(repeatString("a", n));

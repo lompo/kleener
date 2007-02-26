@@ -19,7 +19,6 @@ abstract class AbstractPattern implements Pattern
         this.start = e.getStart();
         e.patch(State.MATCH);
 
-        int[] counts = new int[2];
         Set<State> states = new LinkedHashSet<State>();
         states.add(State.MATCH);
         
