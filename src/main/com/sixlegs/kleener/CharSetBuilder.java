@@ -4,7 +4,7 @@ import java.util.*;
 
 public class CharSetBuilder
 {
-    private static final Comparator START_COMPARATOR = new Comparator<Range>(){
+    private static final Comparator<Range> START_COMPARATOR = new Comparator<Range>(){
         public int compare(Range r1, Range r2) {
             return r1.start - r2.start;
         }
