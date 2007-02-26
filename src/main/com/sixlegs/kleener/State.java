@@ -3,6 +3,7 @@ package com.sixlegs.kleener;
 final class State
 {
     public enum Op {
+        NotCharSet,
         CharSet,
         Split,
         LParen,
@@ -22,9 +23,9 @@ final class State
     private final Edge edge2;
     private int id = -1;
 
-    public static State charSet(CharSet cset, Edge edge) {
+    public static State charSet(CharSet cset, Edge edge, boolean negate) {
         assert cset != null && edge != null;
-        return new State(Op.CharSet, 0, cset, edge, null);
+        return new State(negate ? Op.NotCharSet : Op.CharSet, 0, cset, edge, null);
     }
 
     public static State lParen(int data, Edge edge) {

@@ -52,8 +52,12 @@ final public class Expression
     }
 
     public static Expression literal(CharSet cset) {
+        return literal(cset, false);
+    }
+
+    public static Expression literal(CharSet cset, boolean negate) {
         Edge edge = new Edge();
-        return new Expression(State.charSet(cset, edge), Collections.singletonList(edge));
+        return new Expression(State.charSet(cset, edge, negate), Collections.singletonList(edge));
     }
 
     public static Expression concat(Expression left, Expression right) {

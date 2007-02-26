@@ -53,6 +53,10 @@ abstract class AbstractPattern implements Pattern
                 if (state.getCharSet().contains(c))
                     addState(nlist, state.getState1(), tmatch, p);
                 break;
+            case NotCharSet:
+                if (!state.getCharSet().contains(c))
+                    addState(nlist, state.getState1(), tmatch, p);
+                break;
             case Match:
                 System.arraycopy(tmatch, 0, match, 0, parenCount);
                 return;
@@ -75,6 +79,7 @@ abstract class AbstractPattern implements Pattern
         switch (state.getOp()) {
         case Match:
         case CharSet:
+        case NotCharSet:
             break;
         case Split:
             addState(threads, state.getState1(), match, p);
