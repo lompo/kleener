@@ -3,7 +3,7 @@ package com.sixlegs.kleener;
 import java.util.*;
 import java.util.regex.MatchResult;
 
-abstract class AbstractPattern implements Pattern
+abstract class PatternHelper extends Pattern
 {
     private static final Sub EMPTY_SUB = new Sub(-1, -1);
     private static final Sub START_SUB = new Sub(0, -1);
@@ -14,7 +14,8 @@ abstract class AbstractPattern implements Pattern
     protected final int parenCount;
     private final State[] states;
 
-    public AbstractPattern(Expression e) {
+    public PatternHelper(String regex, Expression e) {
+        super(regex);
         if (e.getStart().getOp() != State.Op.LParen)
             throw new IllegalArgumentException("Outer expression must be paren");
         this.start = e.getStart();
@@ -27,6 +28,12 @@ abstract class AbstractPattern implements Pattern
         this.stateCount = states.size();
         this.states = states.toArray(new State[stateCount]);
     }
+
+    public Matcher matcher(CharSequence input) {
+        return createMatcher().reset(input);
+    }
+
+    abstract protected Matcher createMatcher();
 
     private static int visit(State state, Set<State> mark) {
         if (state == null || mark.contains(state))
@@ -95,33 +102,5 @@ abstract class AbstractPattern implements Pattern
             addState(threads, state.getState1(), match, p);
             match[data] = save;
         }
-    }
-
-    protected static MatchResult getResult(final CharSequence chars, final Sub[] match) {
-        if (match[0] == null || match[0].sp < 0)
-            return null;
-        return new MatchResult() {
-            public String group() {
-                return group(0);
-            }
-            public int groupCount() {
-                return match.length - 1;
-            }
-            public String group(int group) {
-                return chars.subSequence(match[group].sp, match[group].ep).toString();
-            }
-            public int start() {
-                return 0;
-            }
-            public int end() {
-                return chars.length();
-            }
-            public int start(int group) {
-                return match[group].sp;
-            }
-            public int end(int group) {
-                return match[group].ep;
-            }
-        };
     }
 }
