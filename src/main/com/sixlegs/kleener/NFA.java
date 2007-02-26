@@ -15,24 +15,28 @@ class NFA extends PatternHelper
 
     private static class NFAMatcher extends Matcher
     {
+        private Sub[][] empty;
         private Sub[][] clist;
         private Sub[][] nlist;
         private Sub[][] t;
 
         public NFAMatcher(NFA pattern) {
             super(pattern);
+            empty = new Sub[pattern.stateCount][];
             clist = new Sub[pattern.stateCount][];
             nlist = new Sub[pattern.stateCount][];            
         }
 
-        protected boolean match(int p) {
+        protected void match(int p) {
             pattern.startSet(p, clist);
-            for (int len = input.length(); p < len; p++) { // TODO: short circuit
+            for (int len = input.length(); p < len; p++) {
                 pattern.step(clist, input.charAt(p), p + 1, nlist, match);
                 t = clist; clist = nlist; nlist = t; // swap
+                if (Arrays.equals(clist, empty)) { // TODO: need different data structure to make this efficient
+                    break;
+                }
             }
             pattern.step(clist, 0, p, nlist, match);
-            return updateMatch();
         }
     }
 }
