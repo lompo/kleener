@@ -3,6 +3,7 @@ package com.sixlegs.kleener;
 import static com.sixlegs.kleener.Expression.*;
 import static com.sixlegs.kleener.Pattern.CompileType.*;
 import java.util.*;
+import java.util.regex.MatchResult;
 
 public class Main
 {

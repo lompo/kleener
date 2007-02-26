@@ -1,6 +1,7 @@
 package com.sixlegs.kleener;
 
 import java.util.*;
+import java.util.regex.MatchResult;
 
 class NFA extends AbstractPattern
 {
