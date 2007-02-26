@@ -33,13 +33,15 @@ class DFA extends PatternHelper
             this.dstates = dstates;
         }
         
-        protected boolean match(int p) {
+        protected void match(int p) {
             pattern.startSet(p, nlist);
             DState d = dstate(nlist);
             DState next;
             for (int len = input.length(); p < len; p++) { // TODO: short circuit
                 char c = input.charAt(p);
                 int index = equiv.getIndex(c);
+                if (index < 0)
+                    return; // TODO: make non-match zero, and reserve slot in DState.next?
                 if ((next = d.next[index]) == null) {
                     pattern.step(d.threads, c, p + 1, nlist, match);
                     next = d.next[index] = dstate(nlist);
@@ -47,7 +49,6 @@ class DFA extends PatternHelper
                 d = next;
             }
             pattern.step(d.threads, 0, p, nlist, match);
-            return updateMatch();
         }
 
         private DState dstate(Sub[][] threads) {

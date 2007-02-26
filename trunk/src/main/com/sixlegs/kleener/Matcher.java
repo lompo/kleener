@@ -31,26 +31,29 @@ abstract public class Matcher implements MatchResult
         return reset();
     }
 
-    protected boolean updateMatch() {
-        return matched = match[0] != null && match[0].sp >= 0;
-    }
-    
     public boolean matches() {
         reset();
-        return matched = match(0) && end() == regionEnd;
+        matched = matchHelper(0) && end() == regionEnd;
+        return matched;
     }
 
     public boolean find() {
-        int p = matched ? match[0].ep : regionStart;
-        // TODO
-        return match(p);
+        return matchHelper(matched ? match[0].ep : regionStart);
     }
 
     public boolean find(int start) {
         reset();
-        return find();
+        return matchHelper(start);
     }
 
+    private boolean matchHelper(int p) {
+        matched = false;
+        java.util.Arrays.fill(match, null);
+        match(p);
+        matched = match[0] != null && match[0].sp >= 0;
+        return matched;
+    }
+    
     private void requireMatch() {
         if (!matched)
             throw new IllegalStateException("no current match");
@@ -72,13 +75,11 @@ abstract public class Matcher implements MatchResult
     }
 
     public int start() {
-        requireMatch();
-        return 0;
+        return start(0);
     }
 
     public int end() {
-        requireMatch();
-        return input.length();
+        return end(0);
     }
 
     public int start(int group) {
@@ -91,5 +92,5 @@ abstract public class Matcher implements MatchResult
         return match[group].ep;
     }
 
-    abstract protected boolean match(int p);
+    abstract protected void match(int p);
 }

@@ -1,20 +1,23 @@
 package com.sixlegs.kleener;
 
+import java.util.*;
 import org.testng.annotations.*;
 
 public class TestSplit
 {
     @Test public void testSunExamples() {
-        split(":", "boo:and:foo", 2, new String[]{ "boo", "and:foo" });
-        split(":", "boo:and:foo", 5, new String[]{ "boo", "and", "foo" });
-        split(":", "boo:and:foo", -2, new String[]{ "boo", "and", "foo" });
-        split("o", "boo:and:foo", 5, new String[]{ "b", "", ":and:f", "", "" });
-        split("o", "boo:and:foo", -2, new String[]{ "b", "", ":and:f", "", "" });
-        split("o", "boo:and:foo", 0, new String[]{ "b", "", ":and:foo" });
+        split(":", "boo:herby:foo", 2, new String[]{ "boo", "herby:foo" });
+        split(":", "boo:herby:foo", 5, new String[]{ "boo", "herby", "foo" });
+        split(":", "boo:herby:foo", -2, new String[]{ "boo", "herby", "foo" });
+        split("o", "boo:herby:foo", 5, new String[]{ "b", "", ":herby:f", "", "" });
+        split("o", "boo:herby:foo", -2, new String[]{ "b", "", ":herby:f", "", "" });
+        split("o", "boo:herby:foo", 0, new String[]{ "b", "", ":herby:f" });
     }
 
     private void split(String regex, CharSequence input, int limit, String[] expect) {
-        assertTrue(Arrays.deepEquals(Pattern.compile(regex).split(input, limit), expect));
+        String[] result = Pattern.compile(regex).split(input, limit);
+        assert Arrays.deepEquals(result, expect) :
+            "Expected " + Arrays.deepToString(expect) + ", got " + Arrays.deepToString(result);
     }
     
     private CharSet range(Integer... range) {

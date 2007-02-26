@@ -64,7 +64,7 @@
         <attribute name="includes" default="**/Test*.java"/>
         <attribute name="refid"/>
         <sequential>
-            <testng classpathref="@{refid}">
+            <testng classpathref="@{refid}" verbose="2">
                 <classfileset dir="build/test" includes="@{includes}"/>
             </testng>
         </sequential>

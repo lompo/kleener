@@ -17,7 +17,7 @@ abstract public class Pattern
     }
 
     public static Pattern compile(String regex) {
-        return compile(regex, CompileType.DFA);
+        return compile(regex, CompileType.NFA); // TODO: change to DFA
     }
 
     public static Pattern compile(String regex, CompileType type) {
@@ -43,12 +43,17 @@ abstract public class Pattern
     }
 
     public String[] split(CharSequence input, int limit) {
-        List<String> parts = new ArrayList<String>((limit == 0) ? 10 : limit);
+        List<String> parts = new ArrayList<String>((limit <= 0) ? 10 : limit);
         Matcher m = matcher(input);
-        int p = 0, count = 0;
-        while (++count < limit && m.find(p))
-            parts.add(input.subSequence(p, p = m.end()).toString());
+        int p = 0;
+        for (int count = 0; ++count != limit && m.find(p); p = m.end())
+            parts.add(input.subSequence(p, m.start()).toString());
         parts.add(input.subSequence(p, input.length()).toString());
+        if (limit == 0) {
+            int size = parts.size();
+            while ("".equals(parts.get(size - 1)))
+                parts.remove(--size);
+        }
         return parts.toArray(new String[parts.size()]);
     }
 }
