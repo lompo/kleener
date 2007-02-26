@@ -16,8 +16,12 @@ final public class SingleCharSet extends CharSet
         return (c <= this.c) ? this.c : -1;
     }
     
-    @Override public boolean isEmpty() {
+    public boolean isEmpty() {
         return false;
+    }
+
+    public int cardinality() {
+        return 1;
     }
 
     public CharSet intersect(CharSet cset) {
