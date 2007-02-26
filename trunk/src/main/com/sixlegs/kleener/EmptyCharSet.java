@@ -12,8 +12,12 @@ final public class EmptyCharSet extends CharSet
         return -1;
     }
 
-    @Override public boolean isEmpty() {
+    public boolean isEmpty() {
         return true;
+    }
+
+    public int cardinality() {
+        return 0;
     }
 
     public CharSet intersect(CharSet cset) {

@@ -93,9 +93,23 @@ public class CharSetBuilder
     {
         private final List<Range> ranges;
         private final Range key = new Range();
+        private final int cardinality;
         
         public RangeCharSet(List<Range> ranges) {
             this.ranges = ranges;
+            int total = 0;
+            for (Range r : ranges)
+                total += r.end - r.start + 1;
+            cardinality = total;
+            assert cardinality > 0;
+        }
+
+        public int cardinality() {
+            return cardinality;
+        }
+
+        public boolean isEmpty() {
+            return false;
         }
 
         public boolean contains(int c) {
@@ -124,27 +138,28 @@ public class CharSetBuilder
 
         // TODO: provide more efficient impl if cset is also range
         public CharSet intersect(CharSet cset) {
-            if (cset.isEmpty())
-                return cset;
-            // TODO: knowing cardinality would help here (want to iterate over smaller one)
-            CharSetBuilder builder = new CharSetBuilder();
-            for (int c = cset.nextChar(0); c >= 0; c = cset.nextChar(c + 1)) {
-                if (contains(c))
-                    builder.add(c);
+            if (cset.cardinality() < cardinality) {
+                if (cset.isEmpty())
+                    return cset;
+                return combine(cset, this, false);
             }
-            return builder.build();
+            return combine(this, cset, false);
         }
 
         // TODO: provide more efficient impl if cset is also range
         public CharSet subtract(CharSet cset) {
             if (cset.isEmpty())
                 return this;
-            CharSetBuilder builder = new CharSetBuilder();
-            for (int c = nextChar(0); c >= 0; c = nextChar(c + 1)) {
-                if (!cset.contains(c))
-                    builder.add(c);
-            }
-            return builder.build();
+            return combine(this, cset, true);
         }
+    }
+
+    private static CharSet combine(CharSet cset1, CharSet cset2, boolean subtract) {
+        // TODO: knowing cardinality would help here (want to iterate over smaller one)
+        CharSetBuilder builder = new CharSetBuilder();
+        for (int c = cset1.nextChar(0); c >= 0; c = cset1.nextChar(c + 1))
+            if (cset2.contains(c) ^ subtract)
+                builder.add(c);
+        return builder.build();
     }
 }
