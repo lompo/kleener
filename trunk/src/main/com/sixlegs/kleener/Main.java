@@ -10,19 +10,16 @@ public class Main
     // sample from wikipedia
     // "(public|private|protected|)\s*(\w+)\s+(\w+)\s*\("
     
-    private static CharSet SPACE = new CharSetBuilder().add(" \t\n\r\f\n").build();
-    private static CharSet ALNUM = new CharSetBuilder().add('a', 'z').add('A', 'Z').add('0', '9').build();
-
     public static void main(String[] args) throws Exception {
         Expression e =
             paren(concat(repeat(paren(or(literal("public"),
                                          literal("private"),
                                          literal("protected")), 1), 0, 1),
-                         repeat(literal(SPACE), 0, 0),
-                         paren(repeat(literal(ALNUM), 1, 0), 2),
-                         repeat(literal(SPACE), 1, 0),
-                         paren(repeat(literal(ALNUM), 1, 0), 3),
-                         repeat(literal(SPACE), 0, 0),
+                         repeat(literal(PosixCharSet.Space), 0, 0),
+                         paren(repeat(literal(PosixCharSet.Alnum), 1, 0), 2),
+                         repeat(literal(PosixCharSet.Space), 1, 0),
+                         paren(repeat(literal(PosixCharSet.Alnum), 1, 0), 3),
+                         repeat(literal(PosixCharSet.Space), 0, 0),
                          literal("(")), 0);
 
         String str1 = "public  int main(";
