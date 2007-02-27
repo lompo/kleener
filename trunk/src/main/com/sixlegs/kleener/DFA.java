@@ -53,9 +53,10 @@ class DFA extends PatternHelper
             Object key = new DeepKey(threads);
             DState d = dstates.get(key);
             if (d == null) {
-                threads = threads.clone(); // TODO: deep clone necessary?
-                dstates.put(new DeepKey(threads, key.hashCode()),
-                            d = new DState(threads, equiv.size()));
+                Sub[][] copy = new Sub[threads.length][];
+                System.arraycopy(threads, 0, copy, 0, threads.length); // TODO: deep clone necessary?
+                dstates.put(new DeepKey(copy, key.hashCode()),
+                            d = new DState(copy, equiv.size()));
             }
             return d;
         }
