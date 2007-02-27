@@ -3,6 +3,8 @@ package com.sixlegs.kleener;
 // immutable
 abstract public class CharSet
 {
+    public static final int UNKNOWN_CARDINALITY = Integer.MAX_VALUE;
+    
     abstract public boolean contains(int c);
 
     // TODO: use iterator instead? (better for charset builder)
