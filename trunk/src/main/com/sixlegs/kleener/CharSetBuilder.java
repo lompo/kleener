@@ -138,11 +138,10 @@ public class CharSetBuilder
 
         // TODO: provide more efficient impl if cset is also range
         public CharSet intersect(CharSet cset) {
-            if (cset.cardinality() < cardinality) {
-                if (cset.isEmpty())
-                    return cset;
+            if (cset.isEmpty())
+                return cset;
+            if (cset.cardinality() < cardinality)
                 return combine(cset, this, false);
-            }
             return combine(this, cset, false);
         }
 
