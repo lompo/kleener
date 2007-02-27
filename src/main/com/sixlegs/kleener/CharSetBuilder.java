@@ -25,12 +25,14 @@ public class CharSetBuilder
         return this;
     }
 
+    // TODO: if cset is Range, delegate to add(start, end)
     public CharSetBuilder add(CharSet cset) {
         for (int c = cset.nextChar(0); c >= 0; c = cset.nextChar(c + 1))
             add(c);
         return this;
     }
 
+    // TODO: update ranges directly instead of delegating to add(c)
     public CharSetBuilder add(int start, int end) {
         assert start <= end;
         for (int c = start; c <= end; c++)
@@ -38,7 +40,6 @@ public class CharSetBuilder
         return this;
     }
 
-    // TODO: performance
     public CharSetBuilder add(int c) {
         key.start = c;
         int index = Collections.binarySearch(ranges, key, START_COMPARATOR);
