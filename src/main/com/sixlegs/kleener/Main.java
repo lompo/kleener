@@ -10,15 +10,7 @@ public class Main
     // sample from wikipedia
     // "(public|private|protected|)\s*(\w+)\s+(\w+)\s*\("
     
-    public static void main(String[] args) throws Exception {
-        UnionCharSet.union(Arrays.asList(UnicodeCategoryCharSet.get(Character.UPPERCASE_LETTER),
-                                         UnicodeCategoryCharSet.get(Character.LOWERCASE_LETTER),
-                                         UnicodeCategoryCharSet.get(Character.TITLECASE_LETTER),
-                                         UnicodeCategoryCharSet.get(Character.DECIMAL_DIGIT_NUMBER),
-                                         UnicodeCategoryCharSet.get(Character.LETTER_NUMBER),
-                                         UnicodeCategoryCharSet.get(Character.OTHER_NUMBER),
-                                         new CharSetBuilder().add(0x4300, 0x9fa5).add(0x3007).add(0x3021, 0x3029).build()));
-            
+    public static void main(String[] args) throws Exception {            
         Expression e =
             paren(concat(repeat(paren(or(literal("public"),
                                          literal("private"),
