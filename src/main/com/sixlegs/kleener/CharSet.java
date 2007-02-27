@@ -3,7 +3,7 @@ package com.sixlegs.kleener;
 // immutable
 abstract public class CharSet
 {
-    public static final int UNKNOWN_CARDINALITY = Integer.MAX_VALUE;
+    public static final int UNKNOWN_CARDINALITY = Character.MAX_CODE_POINT + 1;
     
     abstract public boolean contains(int c);
 
@@ -12,7 +12,7 @@ abstract public class CharSet
 
     abstract public CharSet intersect(CharSet cset);
     abstract public CharSet subtract(CharSet cset);
-    abstract public int cardinality();
+    abstract public int cardinality(); // upper bound
     abstract public boolean isEmpty();
 
     @Override public String toString() {

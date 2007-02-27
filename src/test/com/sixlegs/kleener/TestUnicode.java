@@ -37,7 +37,16 @@ public class TestUnicode
                 bits.set(i);
             }
         }
-        printRanges("block", map);
+        System.err.println("///////// categories ////////");
+        Map<Character.UnicodeBlock,List<Range>> rangeMap = getRanges(map);
+        for (Character.UnicodeBlock block : map.keySet()) {
+            List<Range> ranges = rangeMap.get(block);
+            if (ranges.size() > 1)
+                throw new IllegalStateException("block cannot have more than one range");
+            Range r = ranges.get(0);
+            System.err.println("0x" + Integer.toHexString(r.start) + ", " +
+                               "0x" + Integer.toHexString(r.end));
+        }
     }
 
     @Test(groups = { "unicode" })
@@ -70,38 +79,63 @@ public class TestUnicode
         printRanges("category", map);
     }
 
-    private static <T> void printRanges(String label, Map<T,BitSet> map) {
-        System.err.println("//////////////// " + label + " ////////////////");
+    private static class Range {
+        final int start;
+        final int end;
+
+        public Range(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
+    }
+
+    private static <T> Map<T,List<Range>> getRanges(Map<T,BitSet> map) {
+        Map<T,List<Range>> rangeMap = Generics.newHashMap();
         for (T block : map.keySet()) {
-            StringBuilder sb = new StringBuilder();
+            List<Range> ranges = Generics.newArrayList();
+            rangeMap.put(block, ranges);
             BitSet bits = map.get(block);
             int prev = -2;
             int start = -1;
             int count = 0;
-            sb.append(label).append("Map.put(").append(block.toString()).append(", new CharSetBuilder()");
             for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
                 if (i != prev + 1) {
-                    count += rangeHelper(sb, start, prev);
+                    rangeHelper(ranges, start, prev);
                     start = i;
                 }
                 prev = i;
             }
-            count += rangeHelper(sb, start, prev);
-            sb.append(".build());");
-            if (count > 25) {
-                System.err.println("// " + block + " has " + count + " ranges");
-            } else {
-                System.err.println(sb);
-            }
+            rangeHelper(ranges, start, prev);
         }
+        return rangeMap;
     }
 
-    private static int rangeHelper(StringBuilder sb, int start, int end) {
-        if (start >= 0) {
-            sb.append(".add(").append(start).append(", ").append(end).append(")");
-            return 1;
-        }
-        return 0;
+    private static void rangeHelper(List<Range> ranges, int start, int end) {
+        if (start >= 0)
+            ranges.add(new Range(start, end));
     }
 
+    private static <T> void printRanges(String label, Map<T,BitSet> map) {
+        Map<T,List<Range>> rangeMap = getRanges(map);
+        System.err.println("//////////////// " + label + " ////////////////");
+        for (T block : map.keySet()) {
+            BitSet bits = map.get(block);
+            List<Range> ranges = rangeMap.get(block);
+            int count = ranges.size();
+             if (count <= 25 || count * 2 > bits.cardinality()) {
+                 StringBuilder sb = new StringBuilder();
+                 sb.append(label).append("Map.put(").append(block.toString()).append(", new CharSetBuilder()");
+                 for (Range r : ranges) {
+                     sb.append(".add(").append(r.start);
+                     if (r.start != r.end)
+                         sb.append(", ").append(r.end);
+                     sb.append(")");
+                 }
+                 sb.append(".build());");
+                 System.err.println(sb.toString());
+             } else {
+                 System.err.println("// " + block + " has " + count + " ranges, " + bits.cardinality() + " codepoints, last is " + (bits.length() - 1));
+             }
+        }
+    }
 }
