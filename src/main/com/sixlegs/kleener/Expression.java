@@ -23,6 +23,19 @@ final class Expression
         this.out = out;
     }
 
+    @Override public boolean equals(Object o) {
+        if (!(o instanceof Expression))
+            return false;
+        Expression e = (Expression)o;
+        // TODO: add equals/hashCode to State
+        return start.equals(e.start) &&
+            out.equals(e.out);
+    }
+
+    @Override public int hashCode() {
+        return start.hashCode();
+    }
+
     protected State getStart() {
         return start;
     }
