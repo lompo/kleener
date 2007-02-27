@@ -30,7 +30,7 @@ public class CharSetBuilder
             add(c);
         return this;
     }
-    
+
     public CharSetBuilder add(int start, int end) {
         assert start <= end;
         for (int c = start; c <= end; c++)

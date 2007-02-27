@@ -2,18 +2,22 @@ package com.sixlegs.kleener;
 
 abstract class GenericCharSet extends CharSet
 {
+    private final int last;
     private Boolean empty;
-    private Integer cardinality;
     
+    protected GenericCharSet(int last) {
+        this.last = last;
+    }
+
+    public int nextChar(int c) {
+        for (int i = c; i <= last; i++)
+            if (contains(i))
+                return i;
+        return -1;
+    }
+
     public int cardinality() {
-        // TODO: is this wise? should cardinality be an upper bound instead?
-        if (cardinality == null) {
-            int count = 0;
-            for (int c = nextChar(0); c >= 0; c = nextChar(c + 1))
-                count++;
-            cardinality = count;
-        }
-        return cardinality;
+        return last; // upper bound
     }
     
     public boolean isEmpty() {
@@ -40,6 +44,7 @@ abstract class GenericCharSet extends CharSet
         private final CharSet cset2;
 
         public IntersectCharSet(CharSet cset1, CharSet cset2) {
+            super(UNKNOWN_CARDINALITY);
             this.cset1 = cset1;
             this.cset2 = cset2;
         }
@@ -65,6 +70,7 @@ abstract class GenericCharSet extends CharSet
         private final CharSet cset2;
 
         public SubtractCharSet(CharSet cset1, CharSet cset2) {
+            super(UNKNOWN_CARDINALITY);
             this.cset1 = cset1;
             this.cset2 = cset2;
         }
