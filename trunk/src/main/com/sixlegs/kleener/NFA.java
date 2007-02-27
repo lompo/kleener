@@ -15,7 +15,7 @@ class NFA extends PatternHelper
 
     private static class NFAMatcher extends Matcher
     {
-        private Sub[][] empty;
+        private final Sub[][] empty;
         private Sub[][] clist;
         private Sub[][] nlist;
         private Sub[][] t;

@@ -9,14 +9,14 @@ class EquivMap
     private final int[] ascii = new int[128];
 
     public EquivMap(State start) {
-        Arrays.fill(ascii, -1);
+        Arrays.fill(ascii, 0);
         split(start, new HashSet<State>());
-        size = csets.size();
+        size = csets.size() + 1;
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < csets.size(); i++) {
             CharSet cset = csets.get(i);
             for (int c = cset.nextChar(0); c >= 0 && c < 128; c = cset.nextChar(c + 1))
-                ascii[c] = i;
+                ascii[c] = i + 1;
         }
     }
     
@@ -31,8 +31,8 @@ class EquivMap
         // TODO: better data structure?
         for (int i = 0; i < size; i++)
             if (csets.get(i).contains(c))
-                return i;
-        return -1;
+                return i + 1;
+        return 0;
     }
 
     private void split(State state, Set<State> mark) {

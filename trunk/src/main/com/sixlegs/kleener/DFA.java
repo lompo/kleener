@@ -22,6 +22,7 @@ class DFA extends PatternHelper
 
     private static class DFAMatcher extends Matcher
     {
+        private final Sub[][] empty;
         private final Sub[][] nlist;
         private final EquivMap equiv;
         private final Map<Object,DState> dstates;
@@ -31,6 +32,7 @@ class DFA extends PatternHelper
             nlist = new Sub[pattern.stateCount][];
             this.equiv = equiv;
             this.dstates = dstates;
+            empty = new Sub[pattern.stateCount][];
         }
         
         protected void match(int p) {
@@ -40,8 +42,6 @@ class DFA extends PatternHelper
             for (int len = input.length(); p < len; p++) { // TODO: short circuit
                 char c = input.charAt(p);
                 int index = equiv.getIndex(c);
-                if (index < 0)
-                    return; // TODO: make non-match zero, and reserve slot in DState.next?
                 if ((next = d.next[index]) == null) {
                     pattern.step(d.threads, c, p + 1, nlist, match);
                     next = d.next[index] = dstate(nlist);
