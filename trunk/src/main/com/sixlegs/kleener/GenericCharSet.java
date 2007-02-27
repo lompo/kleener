@@ -44,7 +44,7 @@ abstract class GenericCharSet extends CharSet
         private final CharSet cset2;
 
         public IntersectCharSet(CharSet cset1, CharSet cset2) {
-            super(UNKNOWN_CARDINALITY);
+            super(Math.min(cset1.cardinality(), cset2.cardinality()));
             this.cset1 = cset1;
             this.cset2 = cset2;
         }
@@ -70,7 +70,7 @@ abstract class GenericCharSet extends CharSet
         private final CharSet cset2;
 
         public SubtractCharSet(CharSet cset1, CharSet cset2) {
-            super(UNKNOWN_CARDINALITY);
+            super(cset1.cardinality());
             this.cset1 = cset1;
             this.cset2 = cset2;
         }
