@@ -16,6 +16,11 @@ abstract public class CharSet
     abstract public boolean isEmpty();
 
     @Override public String toString() {
+        int count = cardinality();
+        if (count > 20) {
+            // TODO: use ranges or something
+            return count + " chars";
+        }
         StringBuilder sb = new StringBuilder();
         for (int c = nextChar(0); c >= 0; c = nextChar(c + 1))
             sb.appendCodePoint(c);

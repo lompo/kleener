@@ -11,6 +11,7 @@ class EquivMap
     public EquivMap(State start) {
         Arrays.fill(ascii, 0);
         split(start, new HashSet<State>());
+        Collections.sort(csets, CardinalityComparator.INSTANCE);
         size = csets.size() + 1;
 
         for (int i = 0; i < csets.size(); i++) {
