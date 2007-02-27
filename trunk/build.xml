@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<project name="Kleener" default="run">
+<project name="Kleener" default="jar">
     <property file="${user.home}/build.properties" />
     <property file="build.properties" />
 
@@ -92,13 +92,6 @@
                 <attribute name="Implementation-Version" value="${version}"/>
             </manifest>
         </jar>
-    </target>
-
-    <target name="run" depends="compile" description="Run Main">
-        <java classname="com.sixlegs.kleener.Main" classpathref="path.main" fork="yes">
-            <jvmarg value="-ea"/>
-            <!-- <jvmarg value="-Xprof"/> -->
-        </java>
     </target>
 
     <target name="clean" description="Clean">
