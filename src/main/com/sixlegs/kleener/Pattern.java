@@ -17,7 +17,7 @@ abstract public class Pattern
     }
 
     public static Pattern compile(String regex) {
-        return compile(regex, CompileType.NFA); // TODO: change to DFA
+        return compile(regex, CompileType.DFA);
     }
 
     public static Pattern compile(String regex, CompileType type) {
