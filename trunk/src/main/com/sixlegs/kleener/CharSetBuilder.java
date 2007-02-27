@@ -73,6 +73,10 @@ public class CharSetBuilder
         return ranges.toString();
     }
 
+    public boolean isEmpty() {
+        return ranges.isEmpty();
+    }
+
     public CharSet build() {
         try {
             switch (ranges.size()) {

@@ -73,15 +73,15 @@
     </macrodef>
 
     <target name="test" depends="compile-test" description="Run JUnit tests">
-        <mytest refid="path.test" includes="com/sixlegs/kleener/Test*.class" excludedgroups="unicode"/>
+        <mytest refid="path.test" includes="com/sixlegs/kleener/Test*.class" excludedgroups="unicode,perf"/>
     </target>
 
     <target name="unicode" depends="compile-test" description="Run JUnit tests">
         <mytest refid="path.test" includes="com/sixlegs/kleener/Test*.class" groups="unicode"/>
     </target>
 
-    <target name="todo" depends="compile-test" description="Known JUnit failures">
-        <mytest refid="path.test" includes="**/*Todo.class"/>
+    <target name="perf" depends="compile-test" description="Run JUnit tests">
+        <mytest refid="path.test" includes="com/sixlegs/kleener/Test*.class" groups="perf"/>
     </target>
 
     <target name="jar" depends="compile" description="Create jar">
