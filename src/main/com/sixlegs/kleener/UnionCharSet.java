@@ -43,7 +43,8 @@ class UnionCharSet extends GenericCharSet
         for (CharSet cset : copy)
             total += cset.cardinality();
         int cardinality = (int)Math.min(total, UNKNOWN_CARDINALITY);
-        return new UnionCharSet(new CharSet[copy.size()], cardinality);
+
+        return new UnionCharSet(copy.toArray(new CharSet[copy.size()]), cardinality);
     }
     
     private UnionCharSet(CharSet[] csets, int cardinality) {
