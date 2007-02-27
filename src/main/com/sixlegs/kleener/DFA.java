@@ -22,7 +22,6 @@ class DFA extends PatternHelper
 
     private static class DFAMatcher extends Matcher
     {
-        private final Sub[][] empty;
         private final Sub[][] nlist;
         private final EquivMap equiv;
         private final Map<Object,DState> dstates;
@@ -32,7 +31,6 @@ class DFA extends PatternHelper
             nlist = new Sub[pattern.stateCount][];
             this.equiv = equiv;
             this.dstates = dstates;
-            empty = new Sub[pattern.stateCount][];
         }
         
         protected void match(int p) {
