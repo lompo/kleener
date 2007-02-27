@@ -2,17 +2,24 @@ package com.sixlegs.kleener;
 
 abstract class GenericCharSet extends CharSet
 {
-    private Boolean empty; 
+    private Boolean empty;
+    private Integer cardinality;
     
     public int cardinality() {
-        // TODO: count and cache?
-        return UNKNOWN_CARDINALITY;
+        // TODO: is this wise? should cardinality be an upper bound instead?
+        if (cardinality == null) {
+            int count = 0;
+            for (int c = nextChar(0); c >= 0; c = nextChar(c + 1))
+                count++;
+            cardinality = count;
+        }
+        return cardinality;
     }
     
     public boolean isEmpty() {
         if (empty == null)
             empty = Boolean.valueOf(nextChar(0) >= 0);
-        return empty.booleanValue();
+        return empty;
     }
 
     public CharSet intersect(CharSet cset) {
