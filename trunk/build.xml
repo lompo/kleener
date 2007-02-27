@@ -62,16 +62,22 @@
 
     <macrodef name="mytest">
         <attribute name="includes" default="**/Test*.java"/>
+        <attribute name="groups" default=""/>
+        <attribute name="excludedgroups" default=""/>
         <attribute name="refid"/>
         <sequential>
-            <testng classpathref="@{refid}" verbose="2">
+            <testng classpathref="@{refid}" verbose="2" groups="@{groups}" excludedgroups="@{excludedgroups}">
                 <classfileset dir="build/test" includes="@{includes}"/>
             </testng>
         </sequential>
     </macrodef>
 
     <target name="test" depends="compile-test" description="Run JUnit tests">
-        <mytest refid="path.test" includes="com/sixlegs/kleener/Test*.class"/>
+        <mytest refid="path.test" includes="com/sixlegs/kleener/Test*.class" excludedgroups="unicode"/>
+    </target>
+
+    <target name="unicode" depends="compile-test" description="Run JUnit tests">
+        <mytest refid="path.test" includes="com/sixlegs/kleener/Test*.class" groups="unicode"/>
     </target>
 
     <target name="todo" depends="compile-test" description="Known JUnit failures">
