@@ -8,5 +8,7 @@ class Generics
     public static <T> List<T> newLinkedList() { return new LinkedList<T>(); }
     public static <T> Set<T> newHashSet() { return new HashSet<T>(); }
     public static <T,S> Map<T,S> newHashMap() { return new HashMap<T,S>(); }
+    public static <T,S> Map<T,S> newTreeMap() { return new TreeMap<T,S>(); }
+    public static <T,S> Map<T,S> newLinkedHashMap() { return new LinkedHashMap<T,S>(); }
 }
 
