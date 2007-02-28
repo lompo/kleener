@@ -14,8 +14,8 @@ abstract class PatternHelper extends Pattern
     protected final int parenCount;
     private final State[] states;
 
-    public PatternHelper(String regex, Expression e) {
-        super(regex);
+    public PatternHelper(Expression e, String regex, int flags) {
+        super(regex, flags);
         if (e.getStart().getOp() != State.Op.LParen)
             throw new IllegalArgumentException("Outer expression must be paren");
         this.start = e.getStart();

@@ -5,8 +5,8 @@ import java.util.regex.MatchResult;
 
 class NFA extends PatternHelper
 {
-    public NFA(String regex, Expression e) {
-        super(regex, e);
+    public NFA(Expression e, String regex, int flags) {
+        super(e, regex, flags);
     }
 
     protected Matcher createMatcher() {

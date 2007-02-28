@@ -7,16 +7,6 @@ final class Expression
     private final State start;
     private final List<Edge> out;
 
-    public Pattern compile(String regex, Pattern.CompileType type) {
-        switch (type) {
-        case NFA:
-            return new NFA(regex, this);
-        case DFA:
-            return new DFA(regex, this);
-        }
-        return null;
-    }
-
     private Expression(State start, List<Edge> out) {
         assert !out.isEmpty();
         this.start = start;

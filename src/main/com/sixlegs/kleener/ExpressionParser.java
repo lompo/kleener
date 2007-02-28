@@ -4,7 +4,7 @@ import static com.sixlegs.kleener.Expression.*;
 
 class ExpressionParser
 {
-    public Expression parse(String regex) {
+    public Expression parse(String regex, int flags) {
         // TODO
         return paren(literal(regex), 0);
     }
