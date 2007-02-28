@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.regex.MatchResult;
 import org.testng.annotations.*;
 import static com.sixlegs.kleener.Expression.*;
-import static com.sixlegs.kleener.Pattern.CompileType.*;
 
 public class TestPerf
 {
@@ -24,26 +23,26 @@ public class TestPerf
 
         String str1 = "public  int main(";
         String str2 = " private void foo (";
-        
-        test(e, str1, NFA, 10000);
-        test(e, str2, NFA, 1);
-        test(e, str1, DFA, 10000);
-        test(e, str2, DFA, 1);
+
+        test(new NFA(e, null, 0), str1, 10000);
+        test(new NFA(e, null, 0), str2, 1);
+        test(new DFA(e, null, 0), str1, 10000);
+        test(new DFA(e, null, 0), str2, 1);
     }
 
     @Test(groups = { "perf" })
     public void testRussCox() {
-        test(buildCrazy(29), repeatString("a", 29), NFA, 1);
-        test(buildCrazy(29), repeatString("a", 29), DFA, 1);
-        test(buildCrazy(100), repeatString("a", 100), NFA, 1);
-        test(buildCrazy(100), repeatString("a", 100), DFA, 1);
+        test(new NFA(buildCrazy(29), null, 0), repeatString("a", 29), 1);
+        test(new DFA(buildCrazy(29), null, 0), repeatString("a", 29), 1);
+        test(new NFA(buildCrazy(100), null, 0), repeatString("a", 100), 1);
+        test(new DFA(buildCrazy(100), null, 0), repeatString("a", 100), 1);
     }
 
     @Test(groups = { "perf" })
     public void testRussCoxGraph() {
         List<Long> times1 = new ArrayList<Long>();
         for (int n = 1; n <= 100; n++) {
-            Pattern p = buildCrazy(n).compile(null, NFA);
+            Pattern p = new NFA(buildCrazy(n), null, 0);
             String str = repeatString("a", n);
             long t = System.nanoTime();
             if (!p.matcher(str).matches())
@@ -83,9 +82,7 @@ public class TestPerf
         return sb.toString();
     }
 
-    private static void test(Expression e, String str, Pattern.CompileType type, int count) {
-        long t0 = System.currentTimeMillis();
-        Pattern p = e.compile(null, type);
+    private static void test(Pattern p, String str, int count) {
         long t1 = System.currentTimeMillis();
         Matcher matcher = p.matcher(str);
         if (!matcher.matches())
@@ -96,7 +93,7 @@ public class TestPerf
         
         for (int group = 0; group <= matcher.groupCount(); group++)
             System.err.println("group " + group + ": >>>" + matcher.group(group) + "<<<");
-        System.err.println(type + " compile=" + (t1 - t0) + " run=" + (t2 - t1) + " (" + count + " iterations)");
+        System.err.println(p.getClass().getName() + " run=" + (t2 - t1) + " (" + count + " iterations)");
     }
     
     @Test(groups = { "perf" })
@@ -139,7 +136,7 @@ public class TestPerf
                             repeat(concat(repeat(literal(c2), 0, 0),
                                           literal(c1)), 0, 1))), 0);
 
-        Pattern p = e.compile(null, DFA);
+        Pattern p = new DFA(e, null, 0);
         // TODO: run it!
     }
 

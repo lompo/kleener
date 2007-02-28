@@ -11,8 +11,8 @@ class DFA extends PatternHelper
     // TODO: synchronization
     private final Map<Object,DState> dstates = Generics.newHashMap();
     
-    public DFA(String regex, Expression e) {
-        super(regex, e);
+    public DFA(Expression e, String regex, int flags) {
+        super(e, regex, flags);
         this.equiv = new EquivMap(start);
     }
 
