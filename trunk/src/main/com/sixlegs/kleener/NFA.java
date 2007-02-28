@@ -3,7 +3,7 @@ package com.sixlegs.kleener;
 import java.util.*;
 import java.util.regex.MatchResult;
 
-class NFA extends PatternHelper
+class NFA extends Pattern
 {
     public NFA(Expression e, String regex, int flags) {
         super(e, regex, flags);
@@ -22,9 +22,9 @@ class NFA extends PatternHelper
 
         public NFAMatcher(NFA pattern) {
             super(pattern);
-            empty = new Sub[pattern.stateCount][];
-            clist = new Sub[pattern.stateCount][];
-            nlist = new Sub[pattern.stateCount][];            
+            empty = new Sub[pattern.stateCount()][];
+            clist = new Sub[pattern.stateCount()][];
+            nlist = new Sub[pattern.stateCount()][];            
         }
 
         protected void match(int p) {
