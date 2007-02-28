@@ -3,7 +3,7 @@ package com.sixlegs.kleener;
 import java.util.*;
 import java.util.regex.MatchResult;
 
-class DFA extends PatternHelper
+class DFA extends Pattern
 {
     private final EquivMap equiv;
 
@@ -13,7 +13,7 @@ class DFA extends PatternHelper
     
     public DFA(Expression e, String regex, int flags) {
         super(e, regex, flags);
-        this.equiv = new EquivMap(start);
+        this.equiv = new EquivMap(startState());
     }
 
     protected Matcher createMatcher() {
@@ -28,7 +28,7 @@ class DFA extends PatternHelper
 
         public DFAMatcher(DFA pattern, EquivMap equiv, Map<Object,DState> dstates) {
             super(pattern);
-            nlist = new Sub[pattern.stateCount][];
+            nlist = new Sub[pattern.stateCount()][];
             this.equiv = equiv;
             this.dstates = dstates;
         }
