@@ -48,13 +48,20 @@ abstract public class Matcher implements MatchResult
     }
 
     public String replaceAll(String replacement) {
-        // TODO
-        throw new UnsupportedOperationException("implement me");
+        StringBuilder sb = new StringBuilder();
+        while (find())
+            appendReplacement(sb, replacement);
+        appendTail(sb);
+        return sb.toString();
     }
 
     public String replaceFirst(String replacement) {
-        // TODO
-        throw new UnsupportedOperationException("implement me");
+        if (!find())
+            return input.toString();
+        StringBuilder sb = new StringBuilder();
+        appendReplacement(sb, replacement);
+        appendTail(sb);
+        return sb.toString();
     }
 
     public Matcher region(int start, int end) {

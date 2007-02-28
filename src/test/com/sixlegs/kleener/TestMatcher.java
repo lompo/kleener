@@ -2,6 +2,7 @@ package com.sixlegs.kleener;
 
 import java.util.*;
 import org.testng.annotations.*;
+import static com.sixlegs.kleener.Expression.*;
 
 public class TestMatcher
 {
@@ -14,6 +15,19 @@ public class TestMatcher
         }
         m.appendTail(sb);
         assert "one dog two dogs in the yard".equals(sb.toString());
+    }
+
+    @Test public void testReplaceFirst() {
+        Pattern p = Pattern.compile("dog");
+        Matcher m = p.matcher("zzzdogzzzdogzzz");
+        assert "zzzcatzzzdogzzz".equals(m.replaceFirst("cat"));
+    }
+
+    @Test public void testReplaceAll() {
+        Pattern p = new DFA(paren(concat(repeat(literal("a"), 0, 0), literal("b")), 0), "a*b", 0);
+        Matcher m = p.matcher("aabfooaabfooabfoob");
+        assert "-foo-foo-foo-".equals(m.replaceAll("-"));
+        assert "-foo-foo-foo-".equals(m.replaceAll("-")); // tests dfa caching
     }
 }
 
