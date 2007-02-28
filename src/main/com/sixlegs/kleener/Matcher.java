@@ -48,6 +48,7 @@ abstract public class Matcher implements MatchResult
     }
 
     public String replaceAll(String replacement) {
+        reset();
         StringBuilder sb = new StringBuilder();
         while (find())
             appendReplacement(sb, replacement);
@@ -56,6 +57,7 @@ abstract public class Matcher implements MatchResult
     }
 
     public String replaceFirst(String replacement) {
+        reset();
         if (!find())
             return input.toString();
         StringBuilder sb = new StringBuilder();
