@@ -22,7 +22,7 @@ class DFA extends Pattern
 
     private static class DFAMatcher extends Matcher
     {
-        private final Sub[][] nlist;
+        private Sub[][] nlist;
         private final EquivMap equiv;
         private final Map<Object,DState> dstates;
 
@@ -34,6 +34,7 @@ class DFA extends Pattern
         }
         
         protected void match(int p) {
+            dstates.clear(); // TODO: problem!!!!
             pattern.startSet(p, nlist);
             DState d = dstate(nlist);
             DState next;
